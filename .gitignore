@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs / state / runtime
+*.log
+*.pid
+*.tmp
+*.cache
+state/
+.state/
+
+# Local Xray binaries (downloaded at deploy time)
+deploy/bin/
+deploy/geoip.dat
+deploy/geosite.dat
+
+# Subscription dumps / generated configs (kept on server in /var/lib/wisd)
+site/nodes.json
+site/configs/
+
+# Flutter / Android build artifacts
+proxy_manager/.dart_tool/
+proxy_manager/build/
+proxy_manager/.flutter-plugins
+proxy_manager/.flutter-plugins-dependencies
+proxy_manager/.packages
+proxy_manager/.pub-cache/
+proxy_manager/android/.gradle/
+proxy_manager/android/local.properties
+
+# Misc
+*.bak
+*.swp
+*.orig

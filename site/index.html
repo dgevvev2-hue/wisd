@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>wisd — VPS VPN</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<style>
+:root {
+    --bg: #0a0d12;
+    --bg-elev: #11151c;
+    --panel: rgba(20,24,32,0.78);
+    --panel-2: rgba(28,33,44,0.92);
+    --line: rgba(220,235,255,0.10);
+    --line-strong: rgba(220,235,255,0.18);
+    --text: #f4f7fb;
+    --muted: #9aa6b7;
+    --muted-2: #6c7689;
+    --accent: #6ee7b7;
+    --accent-2: #38d5ff;
+    --warn: #fbbf24;
+    --bad: #fb7185;
+    --shadow: 0 24px 64px rgba(0,0,0,0.45);
+    --radius: 20px;
+    --radius-sm: 12px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+:root[data-theme=light] {
+    --bg: #eef4f8;
+    --bg-elev: #ffffff;
+    --panel: rgba(255,255,255,0.88);
+    --panel-2: rgba(245,249,252,0.95);
+    --line: rgba(15,23,42,0.10);
+    --line-strong: rgba(15,23,42,0.20);
+    --text: #101622;
+    --muted: #5a6473;
+    --muted-2: #8590a3;
+    --accent: #16a472;
+    --accent-2: #2563eb;
+    --shadow: 0 20px 56px rgba(30,41,59,0.16);
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+button:disabled { opacity: 0.55; cursor: wait; }
+a { color: var(--accent-2); }
+hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+
+body::before {
+    content: "";
+    position: fixed; inset: 0;
+    background:
+        radial-gradient(60% 50% at 16% 14%, rgba(110,231,183,0.10), transparent 60%),
+        radial-gradient(50% 40% at 84% 13%, rgba(56,213,255,0.10), transparent 60%),
+        radial-gradient(40% 40% at 48% 80%, rgba(110,231,183,0.06), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+body::after {
+    content: "";
+    position: fixed; inset: 0;
+    background:
+        linear-gradient(rgba(220,235,255,0.03) 1px, transparent 1px) 0 0 / 36px 36px,
+        linear-gradient(90deg, rgba(220,235,255,0.03) 1px, transparent 1px) 0 0 / 36px 36px;
+    mask-image: radial-gradient(circle at 50% 40%, #000, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* ---------- nav ---------- */
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.brand .mark {
+    width: 36px; height: 36px;
+    border-radius: 11px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 12px 32px rgba(110,231,183,0.20);
+}
+.brand b { font-size: 18px; letter-spacing: -0.01em; }
+.brand .sub { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+.navRight {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.iconBtn {
+    width: 40px; height: 40px;
+    display: grid; place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+    transition: 0.16s transform, 0.16s border-color, 0.16s background;
+}
+.iconBtn:hover { transform: translateY(-1px); border-color: var(--accent); }
+.iconBtn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    font-weight: 700;
+    transition: 0.16s transform, 0.16s border-color;
+}
+.pill:hover { transform: translateY(-1px); border-color: var(--accent); }
+
+/* ---------- main grid ---------- */
+.layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 22px;
+}
+@media (max-width: 960px) {
+    .layout { grid-template-columns: 1fr; }
+}
+
+.panel {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+    backdrop-filter: blur(20px);
+}
+
+/* ---------- left: power & status ---------- */
+.left {
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.timer {
+    text-align: center;
+    font-size: 44px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+.power-wrap { display: grid; place-items: center; }
+.power {
+    width: 134px; height: 134px;
+    border-radius: 36px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+    display: grid; place-items: center;
+    transition: 0.18s transform, 0.18s box-shadow;
+}
+.power:hover { transform: translateY(-2px); box-shadow: 0 16px 48px rgba(110,231,183,0.16); }
+.power .circle {
+    width: 78px; height: 78px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: grid; place-items: center;
+    color: #06120d;
+    font-size: 24px;
+    font-weight: 900;
+    box-shadow: 0 8px 28px rgba(110,231,183,0.35);
+}
+.power.off .circle { background: var(--muted-2); color: #dbe4ef; box-shadow: none; }
+
+.status {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-weight: 800;
+    font-size: 14px;
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted-2); }
+.dot.on { background: var(--accent); box-shadow: 0 0 0 2px rgba(110,231,183,0.20); }
+.status-sub { font-size: 12px; color: var(--muted); }
+
+.modeSeg {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    overflow: hidden;
+}
+.modeSeg button {
+    height: 44px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 800;
+    transition: 0.16s background, 0.16s color;
+}
+.modeSeg button.active { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #06120d; }
+
+.currentCard {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    background: var(--panel-2);
+}
+.currentCard .lbl { font-size: 11.5px; color: var(--muted); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+.currentCard .name { font-size: 16px; font-weight: 800; margin-top: 4px; }
+.currentCard .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+
+.actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+.btn {
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text);
+    font-weight: 800;
+    transition: 0.16s transform, 0.16s border-color, 0.16s background;
+}
+.btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+.btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #06120d; border-color: transparent; }
+.btn.warn { color: var(--warn); }
+.btn.bad { color: var(--bad); }
+
+.log {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.18);
+    color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    max-height: 110px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* ---------- right: tabs ---------- */
+.right { padding: 0; display: flex; flex-direction: column; min-height: 480px; }
+.tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    border-bottom: 1px solid var(--line);
+}
+.tab {
+    flex: 1;
+    height: 40px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-weight: 800;
+    transition: 0.14s background, 0.14s color;
+}
+.tab.active { background: var(--panel-2); color: var(--text); }
+.tab:hover { color: var(--text); }
+
+.pageWrap { flex: 1; padding: 18px; overflow: auto; }
+.page { display: none; }
+.page.active { display: block; }
+
+/* ---------- servers grid ---------- */
+.tool {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.field {
+    flex: 1;
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text);
+    outline: 0;
+    transition: 0.14s border-color;
+}
+.field:focus { border-color: var(--accent); }
+textarea.field { height: auto; padding: 12px 14px; font-family: ui-monospace, monospace; font-size: 12.5px; }
+
+.servers { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.server {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--panel-2);
+    transition: 0.14s border-color, 0.14s transform;
+    cursor: pointer;
+}
+.server:hover { border-color: var(--accent); transform: translateY(-1px); }
+.server.active { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(110,231,183,0.18) inset; }
+.server .flag { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; background: var(--bg-elev); }
+.server .info { min-width: 0; }
+.server .nm { font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.server .mt { font-size: 11.5px; color: var(--muted); }
+.server .right-meta { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+
+.directCard {
+    border: 1px dashed var(--accent);
+    border-radius: 14px;
+    background: rgba(110,231,183,0.06);
+}
+
+/* ---------- subscriptions ---------- */
+.subList { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.subItem {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--panel-2);
+}
+.subItem .nm { font-weight: 800; font-size: 14px; }
+.subItem .url { font-size: 12px; color: var(--muted); word-break: break-all; margin-top: 2px; }
+.subItem .meta { font-size: 11.5px; color: var(--muted-2); margin-top: 2px; }
+.subBtns { display: flex; gap: 6px; }
+
+.subAdd {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px;
+    background: var(--panel-2);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.subAddTabs {
+    display: flex; gap: 4px;
+    background: var(--bg-elev);
+    border-radius: 10px;
+    padding: 4px;
+}
+.subAddTabs .tt {
+    flex: 1; height: 32px; border-radius: 8px;
+    color: var(--muted); font-weight: 700; font-size: 13px;
+}
+.subAddTabs .tt.active { background: var(--panel); color: var(--text); }
+
+/* ---------- server info card ---------- */
+.serverInfo {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    background: var(--panel-2);
+}
+.serverInfo .row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; }
+.serverInfo .row b { font-weight: 700; }
+.serverInfo .url {
+    margin-top: 12px;
+    background: rgba(0,0,0,0.22);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-family: ui-monospace, monospace;
+    font-size: 12px;
+    word-break: break-all;
+}
+
+/* ---------- toast ---------- */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--panel-2);
+    border: 1px solid var(--line-strong);
+    color: var(--text);
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    box-shadow: var(--shadow);
+    opacity: 0;
+    transition: 0.22s opacity, 0.22s transform;
+    z-index: 30;
+    pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(-6px); }
+.toast.err { border-color: var(--bad); color: var(--bad); }
+
+/* ---------- modal ---------- */
+.modal {
+    position: fixed; inset: 0;
+    background: rgba(8,10,16,0.62);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+    padding: 24px;
+}
+.modal.show { display: flex; }
+.sheet {
+    width: min(520px, 100%);
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: var(--shadow);
+}
+.sheet h3 { margin: 0 0 12px 0; }
+.sheet .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+
+/* misc */
+.empty { padding: 22px; color: var(--muted); text-align: center; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<nav class="nav">
+    <div class="brand">
+        <div class="mark"></div>
+        <div>
+            <b>wisd</b>
+            <div class="sub">VPS · VLESS · Reality</div>
+        </div>
+    </div>
+    <div class="navRight">
+        <button id="themeBtn" class="iconBtn" title="Theme">
+            <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button id="reloadBtn" class="iconBtn" title="Reload">
+            <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div class="layout">
+
+    <!-- ============ LEFT ============ -->
+    <section class="left panel">
+        <div id="timer" class="timer">00:00:00</div>
+        <div class="power-wrap">
+            <button id="powerBtn" class="power off"><span class="circle">ON</span></button>
+        </div>
+        <div class="status">
+            <span class="status-pill"><i id="statusDot" class="dot"></i><span id="statusText">Выключен</span></span>
+            <div id="statusSub" class="status-sub"></div>
+        </div>
+        <div class="modeSeg">
+            <button id="modeDirect" class="active" data-mode="direct">Direct (VPS-IP)</button>
+            <button id="modeTunnel" data-mode="tunnel">Tunnel</button>
+        </div>
+        <div class="currentCard">
+            <div class="lbl">Текущий маршрут</div>
+            <div id="currentName" class="name">—</div>
+            <div id="currentMeta" class="meta">Direct: выход с IP самого VPS</div>
+        </div>
+        <div class="actions">
+            <button id="restartBtn" class="btn">Restart</button>
+            <button id="clearLogBtn" class="btn">Clear log</button>
+        </div>
+        <div id="log" class="log mono">…</div>
+    </section>
+
+    <!-- ============ RIGHT ============ -->
+    <main class="right panel">
+        <div class="tabs">
+            <button class="tab active" data-page="serversPage">Серверы</button>
+            <button class="tab" data-page="subsPage">Подписки</button>
+            <button class="tab" data-page="rulesPage">Маршруты</button>
+            <button class="tab" data-page="vpsPage">Этот VPS</button>
+            <button class="tab" data-page="systemPage">Система</button>
+        </div>
+
+        <div class="pageWrap">
+
+            <!-- SERVERS -->
+            <section id="serversPage" class="page active">
+                <div class="tool">
+                    <input id="search" class="field" placeholder="Поиск по серверам…">
+                </div>
+                <div id="serversBox" class="servers"></div>
+            </section>
+
+            <!-- SUBSCRIPTIONS -->
+            <section id="subsPage" class="page">
+                <div class="subAdd">
+                    <div class="subAddTabs">
+                        <button class="tt active" data-add="url">По URL</button>
+                        <button class="tt" data-add="paste">Вставить VLESS</button>
+                    </div>
+                    <input id="subName" class="field" placeholder="Название подписки">
+                    <div id="subAddUrl">
+                        <input id="subUrl" class="field" placeholder="https://example.com/sub">
+                    </div>
+                    <div id="subAddPaste" style="display:none">
+                        <textarea id="subPaste" class="field" rows="6"
+                            placeholder="vless://...&#10;vless://...&#10;… или base64-блок целиком"></textarea>
+                    </div>
+                    <div class="row" style="display:flex;gap:8px;justify-content:flex-end">
+                        <button id="subAddBtn" class="btn primary">Добавить</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--muted)">Подписки <b>не обновляются автоматически</b> — нажми «↻ Fetch», когда захочешь обновить.</div>
+                </div>
+                <div id="subList" class="subList"></div>
+            </section>
+
+            <!-- RULES -->
+            <section id="rulesPage" class="page">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                    <div>
+                        <div class="lbl" style="font-weight:800;color:var(--muted);font-size:12px;margin-bottom:6px">Через туннель</div>
+                        <textarea id="rulesTunnel" class="field" rows="14" placeholder="example.com&#10;192.0.2.0/24"></textarea>
+                    </div>
+                    <div>
+                        <div class="lbl" style="font-weight:800;color:var(--muted);font-size:12px;margin-bottom:6px">Напрямую (без VPN)</div>
+                        <textarea id="rulesDirect" class="field" rows="14" placeholder="ru.example.com&#10;10.0.0.0/8"></textarea>
+                    </div>
+                </div>
+                <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end">
+                    <button id="rulesSaveBtn" class="btn primary">Сохранить</button>
+                </div>
+                <div style="margin-top:10px;font-size:12px;color:var(--muted)">
+                    Одна запись на строку. Поддерживается домен (<code>example.com</code>, <code>*.example.com</code>) или CIDR/IP. Применяется только в режиме <b>Tunnel</b>.
+                </div>
+            </section>
+
+            <!-- THIS VPS -->
+            <section id="vpsPage" class="page">
+                <div id="vpsBox" class="serverInfo">
+                    <div class="empty">Загрузка…</div>
+                </div>
+            </section>
+
+            <!-- SYSTEM -->
+            <section id="systemPage" class="page">
+                <div id="sysBox" class="serverInfo">
+                    <div class="empty">Загрузка…</div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="confirmModal" class="modal">
+    <div class="sheet">
+        <h3 id="confirmTitle">Подтверждение</h3>
+        <div id="confirmMsg" style="color:var(--muted)"></div>
+        <div class="row">
+            <button class="btn" data-close>Отмена</button>
+            <button id="confirmOk" class="btn primary">OK</button>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
