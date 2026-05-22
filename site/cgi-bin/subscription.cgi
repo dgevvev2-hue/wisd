@@ -19,19 +19,20 @@ ACTION=${QPARAM[action]:-list}
 INDEX_FILE=$WISD_SUB_DIR/index.json
 [[ -f "$INDEX_FILE" ]] || echo '{"subscriptions":[]}' > "$INDEX_FILE"
 
-# parse_vless_lines  reads raw VLESS subscription body (possibly base64-encoded)
-# from stdin and prints a JSON array of node objects:
+# parse_vless_lines <path-to-raw-body>
+# Reads a VLESS subscription body file (possibly base64-encoded) and prints a
+# JSON array of node objects to stdout.
 #   {"name": "...", "host": "...", "port": 443, "uuid": "...",
 #    "type": "tcp"|"grpc"|"ws"|"http", "security": "reality"|"tls"|"none",
 #    "sni": "...", "publicKey": "...", "shortId": "...", "flow": "...",
 #    "serviceName": "...", "path": "...", "headerHost": "...",
 #    "raw": "vless://..."}
 parse_vless_lines() {
-python3 - <<'PY'
-import sys, base64, re, json
+WISD_RAW_PATH=$1 python3 - <<'PY'
+import os, sys, base64, re, json
 from urllib.parse import urlparse, parse_qs, unquote
 
-body = sys.stdin.read().strip()
+body = open(os.environ['WISD_RAW_PATH'], 'r', encoding='utf-8', errors='ignore').read().strip()
 if not body:
     print('[]'); sys.exit(0)
 
@@ -130,7 +131,7 @@ case "$ACTION" in
         sub_id=$(random_hex 6)
         mkdir -p "$WISD_SUB_DIR/$sub_id"
         printf '%s' "$body" > "$WISD_SUB_DIR/$sub_id/raw.txt"
-        if ! parse_vless_lines < "$WISD_SUB_DIR/$sub_id/raw.txt" > "$WISD_SUB_DIR/$sub_id/nodes.json"; then
+        if ! parse_vless_lines "$WISD_SUB_DIR/$sub_id/raw.txt" > "$WISD_SUB_DIR/$sub_id/nodes.json"; then
             rm -rf "$WISD_SUB_DIR/$sub_id"
             json_error 13 "parse failed"
         fi
@@ -160,7 +161,7 @@ case "$ACTION" in
         [[ -n "$url" && "$url" != "null" ]] || json_error 21 "subscription has no URL (manual paste)"
         body=$(curl -fsSL --max-time 30 "$url" 2>/dev/null) || json_error 22 "fetch failed"
         printf '%s' "$body" > "$WISD_SUB_DIR/$sub_id/raw.txt"
-        parse_vless_lines < "$WISD_SUB_DIR/$sub_id/raw.txt" > "$WISD_SUB_DIR/$sub_id/nodes.json" \
+        parse_vless_lines "$WISD_SUB_DIR/$sub_id/raw.txt" > "$WISD_SUB_DIR/$sub_id/nodes.json" \
             || json_error 23 "parse failed"
         count=$(jq 'length' "$WISD_SUB_DIR/$sub_id/nodes.json")
         fetched=$(date -u +%s)

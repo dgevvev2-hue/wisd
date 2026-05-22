@@ -34,7 +34,12 @@ step "Install OS packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y --no-install-recommends \
-    nginx fcgiwrap jq curl ca-certificates unzip uuid-runtime python3 xxd
+    nginx fcgiwrap jq curl ca-certificates unzip uuid-runtime python3 xxd sudo
+# Make sure /etc/sudoers.d exists (minimal Debian images may omit it).
+mkdir -p /etc/sudoers.d
+chmod 0750 /etc/sudoers.d
+grep -q '^@includedir /etc/sudoers.d' /etc/sudoers 2>/dev/null \
+    || echo '@includedir /etc/sudoers.d' >> /etc/sudoers
 
 step "Create wisd user and directories"
 id -u wisd >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin wisd
