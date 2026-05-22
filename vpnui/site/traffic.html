@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Router Traffic</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<style>
+:root{--bg:#090b10;--panel:rgba(17,20,28,.78);--panel2:rgba(24,28,38,.88);--line:rgba(220,235,255,.12);--text:#f8fafc;--muted:#98a3b3;--a:#a7ffc5;--b:#38d5ff;--bad:#fb7185;--warn:#fbbf24;--shadow:0 28px 88px rgba(0,0,0,.44)}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--b) transparent}
+html,body{margin:0;min-height:100%;overflow-x:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input{font:inherit;color:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 12% 12%,rgba(167,255,197,.14),transparent 28%),radial-gradient(circle at 88% 16%,rgba(56,213,255,.1),transparent 25%),radial-gradient(circle at 50% 86%,rgba(167,255,197,.08),transparent 38%);filter:blur(10px);pointer-events:none}
+body:after{content:"";position:fixed;inset:0;background:linear-gradient(rgba(220,235,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(220,235,255,.04) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(circle at 50% 40%,#000,transparent 68%);pointer-events:none}
+.wrap{position:relative;z-index:1;width:min(1280px,100%);min-height:100vh;margin:auto;padding:20px}
+.nav{height:54px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 0 0 1px rgba(255,255,255,.16),0 14px 50px rgba(167,255,197,.16)}.brand b{font-size:18px;white-space:nowrap}.navLinks{display:flex;gap:10px;align-items:center}.pill,.btn{height:42px;border:1px solid var(--line);background:rgba(255,255,255,.035);border-radius:14px;padding:0 14px;text-decoration:none;color:var(--text);font-weight:900;display:inline-flex;align-items:center;gap:8px}.btn:hover,.pill:hover{transform:translateY(-1px);border-color:var(--a);background:rgba(167,255,197,.08)}.btn.primary{background:linear-gradient(135deg,var(--a),#2dd4bf);border-color:transparent;color:#06120d}.btn.red{background:rgba(251,113,133,.14);border-color:rgba(251,113,133,.36);color:#ffd1d8}
+.grid{display:grid;grid-template-columns:330px 1fr;gap:18px}.panel,.card,.client,.event{background:linear-gradient(180deg,var(--panel),rgba(8,10,15,.82));border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(22px);border-radius:24px}.side{padding:14px;display:grid;gap:12px;align-content:start}.main{display:grid;gap:14px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{padding:14px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:950;margin-bottom:7px}.num{font-size:24px;font-weight:950;font-variant-numeric:tabular-nums}.muted{color:var(--muted);font-size:13px;line-height:1.45}.search{height:44px;border:1px solid var(--line);border-radius:14px;background:rgba(0,0,0,.16);color:var(--text);padding:0 13px;outline:0;min-width:0}.search:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(167,255,197,.12)}
+.clients{display:grid;gap:8px;max-height:calc(100vh - 190px);overflow:auto;padding-right:2px}.client{padding:12px;display:grid;gap:8px;box-shadow:none;background:rgba(0,0,0,.14)}.client.active{border-color:var(--a);background:rgba(167,255,197,.1)}.clientTop{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.clientName{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.speed{font-weight:950;color:#20ff95;font-variant-numeric:tabular-nums}.meter{height:7px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));border-radius:999px}.split{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.table{display:grid;gap:8px;max-height:470px;overflow:auto;padding-right:2px}.event{padding:11px;box-shadow:none;background:rgba(0,0,0,.14);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}.domain{font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.badge{border:1px solid var(--line);border-radius:999px;padding:6px 9px;color:var(--muted);font-size:12px;font-weight:900}.topList{display:grid;gap:9px}.topRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center}.topName{font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tiny{font-size:12px;color:var(--muted)}.empty{padding:18px;border:1px dashed var(--line);border-radius:18px;color:var(--muted);text-align:center}.toast{position:fixed;right:18px;bottom:18px;z-index:30}.toast div{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow);border-radius:16px;padding:12px 14px}
+@media(max-width:920px){.wrap{padding:10px}.grid,.split{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.clients,.table{max-height:none}.nav{height:auto;align-items:flex-start}.navLinks{flex-wrap:wrap;justify-content:flex-end}.num{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <div class="brand"><div class="mark"></div><b>Router Traffic</b></div>
+    <div class="navLinks">
+      <a class="pill" href="index.html">VPN</a>
+      <button id="refreshBtn" class="btn primary">Refresh</button>
+      <button id="clearBtn" class="btn red">Clear</button>
+    </div>
+  </nav>
+  <div class="grid">
+    <aside class="side panel">
+      <input id="q" class="search" placeholder="Поиск клиента">
+      <div id="clients" class="clients"></div>
+    </aside>
+    <main class="main">
+      <section class="stats">
+        <div class="card"><div class="label">Download</div><div id="rxTotal" class="num">0 B</div><div class="muted">счётчик клиентов</div></div>
+        <div class="card"><div class="label">Upload</div><div id="txTotal" class="num">0 B</div><div class="muted">счётчик клиентов</div></div>
+        <div class="card"><div class="label">Speed</div><div id="speedTotal" class="num">0 B/s</div><div class="muted">сейчас</div></div>
+        <div class="card"><div class="label">Sites</div><div id="siteTotal" class="num">0</div><div class="muted">последние события</div></div>
+      </section>
+      <section class="split">
+        <div class="card">
+          <div class="label">Activity</div>
+          <div id="events" class="table"></div>
+        </div>
+        <div class="card">
+          <div class="label">Top domains</div>
+          <div id="topDomains" class="topList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const API_BASE=location.protocol==='file:'?'http://192.168.0.1:8083':'';
+const $=id=>document.getElementById(id), api=u=>u.startsWith('http')?u:API_BASE+u;
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+let data={devices:[],events:[]}, selected='all';
+async function j(url){let r=await fetch(api(url),{cache:'no-store'}),t=await r.text();try{return JSON.parse(t)}catch(e){throw new Error(t.slice(0,160)||r.statusText)}}
+function toastMsg(s){let d=document.createElement('div');d.textContent=s;toast.appendChild(d);setTimeout(()=>d.remove(),2600)}
+function bytes(n){n=Number(n||0);let u=['B','KB','MB','GB','TB'],i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return `${n>=10||i===0?n.toFixed(0):n.toFixed(1)} ${u[i]}`}
+function devName(ip){let d=data.devices.find(x=>x.ip===ip);return d?(d.name||d.hostname||d.ip):ip}
+function filteredEvents(){return (data.events||[]).filter(e=>selected==='all'||e.src===selected)}
+function renderStats(){let rx=0,tx=0,rxps=0,txps=0;(data.devices||[]).forEach(d=>{rx+=Number(d.rx||0);tx+=Number(d.tx||0);rxps+=Number(d.rxps||0);txps+=Number(d.txps||0)});rxTotal.textContent=bytes(rx);txTotal.textContent=bytes(tx);speedTotal.textContent=bytes(rxps+txps)+'/s';siteTotal.textContent=String(filteredEvents().length)}
+function renderClients(){let query=q.value.trim().toLowerCase();let list=[{ip:'all',name:'Все клиенты',rxps:0,txps:0,rx:0,tx:0,mac:''},...(data.devices||[])].filter(d=>(d.name+' '+d.ip+' '+d.mac).toLowerCase().includes(query));let max=Math.max(1,...list.map(d=>Number(d.rxps||0)+Number(d.txps||0)));clients.innerHTML=list.map(d=>{let total=Number(d.rxps||0)+Number(d.txps||0),pct=Math.min(100,total/max*100);return `<button class="client ${selected===d.ip?'active':''}" data-ip="${esc(d.ip)}"><div class="clientTop"><div class="clientName">${esc(d.name||d.ip)}</div><div class="speed">${d.ip==='all'?'':bytes(total)+'/s'}</div></div><div class="sub">${d.ip==='all'?'общая лента':esc(d.ip+' / '+(d.iface||'')+' / '+(d.mac||''))}</div><div class="meter"><div class="bar" style="width:${pct}%"></div></div><div class="tiny">↓ ${bytes(d.rx||0)} / ↑ ${bytes(d.tx||0)}</div></button>`}).join('')||'<div class="empty">Клиентов пока нет</div>';document.querySelectorAll('.client').forEach(b=>b.onclick=()=>{selected=b.dataset.ip;render()})}
+function renderEvents(){let ev=filteredEvents();events.innerHTML=ev.length?ev.slice().reverse().map(e=>`<div class="event"><div><div class="domain">${esc(e.url||e.domain)}</div><div class="sub">${esc(devName(e.src))} / ${esc(e.src)} / ${esc(e.time||'')}</div></div><div class="badge">${esc(e.domain||'site')}</div></div>`).join(''):'<div class="empty">Пока нет событий. HTTPS обычно даёт домен, не полный URL.</div>'}
+function renderTop(){let map={};filteredEvents().forEach(e=>{let d=e.domain||e.url||'';if(!d)return;map[d]=(map[d]||0)+1});let rows=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,18);topDomains.innerHTML=rows.length?rows.map(([d,c])=>`<div class="topRow"><div><div class="topName">${esc(d)}</div><div class="tiny">${c} событий</div></div><div class="badge">${c}</div></div>`).join(''):'<div class="empty">Топ появится после активности</div>'}
+function render(){renderStats();renderClients();renderEvents();renderTop()}
+async function load(){refreshBtn.disabled=true;try{data=await j('/cgi-bin/traffic.cgi?action=status');render();toastMsg('OK')}catch(e){toastMsg('Ошибка: '+e.message)}finally{refreshBtn.disabled=false}}
+async function clearTraffic(){if(!confirm('Очистить счётчики панели?'))return;clearBtn.disabled=true;try{await j('/cgi-bin/traffic.cgi?action=clear');await load()}catch(e){toastMsg('Ошибка: '+e.message)}finally{clearBtn.disabled=false}}
+refreshBtn.onclick=load;clearBtn.onclick=clearTraffic;q.oninput=renderClients;load();setInterval(load,5000);
+</script>
+</body>
+</html>

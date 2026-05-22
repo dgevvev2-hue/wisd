@@ -1,0 +1,431 @@
+[
+  {
+    "id": 0,
+    "name": "\ud83c\udde8\ud83c\uddff \u041f\u0440\u0430\u0433\u0430-1",
+    "host": "91.219.227.28",
+    "port": 443,
+    "ips": [
+      "91.219.227.28"
+    ],
+    "ping": 28.9,
+    "network": "grpc"
+  },
+  {
+    "id": 1,
+    "name": "\ud83c\udde8\ud83c\uddff \u041f\u0440\u0430\u0433\u0430-2",
+    "host": "83.166.250.44",
+    "port": 443,
+    "ips": [
+      "83.166.250.44"
+    ],
+    "ping": 28.3,
+    "network": "grpc"
+  },
+  {
+    "id": 2,
+    "name": "\ud83c\uddf3\ud83c\uddf1 \u0410\u043c\u0441\u0442\u0435\u0440\u0434\u0430\u043c-1",
+    "host": "146.185.243.59",
+    "port": 443,
+    "ips": [
+      "146.185.243.59"
+    ],
+    "ping": 24.9,
+    "network": "tcp"
+  },
+  {
+    "id": 3,
+    "name": "\ud83c\uddf3\ud83c\uddf1 \u0410\u043c\u0441\u0442\u0435\u0440\u0434\u0430\u043c-2",
+    "host": "83.166.253.148",
+    "port": 443,
+    "ips": [
+      "83.166.253.148"
+    ],
+    "ping": 28.5,
+    "network": "tcp"
+  },
+  {
+    "id": 4,
+    "name": "\ud83c\uddfa\ud83c\uddf8 \u0421\u0428\u0410",
+    "host": "90.156.218.212",
+    "port": 443,
+    "ips": [
+      "90.156.218.212"
+    ],
+    "ping": 30.4,
+    "network": "tcp"
+  },
+  {
+    "id": 5,
+    "name": "\ud83c\uddf2\ud83c\uddf0 \u041c\u0430\u043a\u0435\u0434\u043e\u043d\u0438\u044f",
+    "host": "91.243.86.170",
+    "port": 443,
+    "ips": [
+      "91.243.86.170"
+    ],
+    "ping": 37.3,
+    "network": "tcp"
+  },
+  {
+    "id": 6,
+    "name": "\ud83c\uddf9\ud83c\uddf7 \u0422\u0443\u0440\u0446\u0438\u044f",
+    "host": "5.42.107.14",
+    "port": 443,
+    "ips": [
+      "5.42.107.14"
+    ],
+    "ping": 53.5,
+    "network": "tcp"
+  },
+  {
+    "id": 7,
+    "name": "\ud83c\udde6\ud83c\uddf1 \u0410\u043b\u0431\u0430\u043d\u0438\u044f",
+    "host": "5.42.105.13",
+    "port": 443,
+    "ips": [
+      "5.42.105.13"
+    ],
+    "ping": 30.4,
+    "network": "tcp"
+  },
+  {
+    "id": 8,
+    "name": "\ud83c\uddf7\ud83c\uddfa \u0420\u043e\u0441\u0441\u0438\u044f-1",
+    "host": "95.163.214.212",
+    "port": 443,
+    "ips": [
+      "95.163.214.212"
+    ],
+    "ping": 29.0,
+    "network": "grpc"
+  },
+  {
+    "id": 9,
+    "name": "\ud83c\udde9\ud83c\uddea \u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f",
+    "host": "2.59.83.55",
+    "port": 443,
+    "ips": [
+      "2.59.83.55"
+    ],
+    "ping": null,
+    "network": "tcp"
+  },
+  {
+    "id": 10,
+    "name": "\ud83c\uddf2\ud83c\udde9 \u041c\u043e\u043b\u0434\u0430\u0432\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "45.84.0.239",
+    "port": 443,
+    "ips": [
+      "45.84.0.239"
+    ],
+    "ping": 105.2,
+    "network": "grpc"
+  },
+  {
+    "id": 11,
+    "name": "\ud83c\uddeb\ud83c\uddf7  \u0424\u0440\u0430\u043d\u0446\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "185.231.205.80",
+    "port": 443,
+    "ips": [
+      "185.231.205.80"
+    ],
+    "ping": 82.4,
+    "network": "grpc"
+  },
+  {
+    "id": 12,
+    "name": "\ud83c\uddf8\ud83c\uddf0 \u0421\u043b\u043e\u0432\u0430\u043a\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "5.252.23.178",
+    "port": 443,
+    "ips": [
+      "5.252.23.178"
+    ],
+    "ping": 87.8,
+    "network": "grpc"
+  },
+  {
+    "id": 13,
+    "name": "\ud83c\uddf1\ud83c\uddfb \u041b\u0430\u0442\u0432\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "193.43.146.243",
+    "port": 443,
+    "ips": [
+      "193.43.146.243"
+    ],
+    "ping": 57.0,
+    "network": "grpc"
+  },
+  {
+    "id": 14,
+    "name": "\ud83c\uddeb\ud83c\uddee \u0424\u0438\u043d\u043b\u044f\u043d\u0434\u0438\u044f-2 | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "185.231.206.210",
+    "port": 443,
+    "ips": [
+      "185.231.206.210"
+    ],
+    "ping": 79.9,
+    "network": "grpc"
+  },
+  {
+    "id": 15,
+    "name": "\ud83c\uddf3\ud83c\uddff \u041d\u043e\u0432\u0430\u044f \u0417\u0435\u043b\u0430\u043d\u0434\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "5.180.22.26",
+    "port": 443,
+    "ips": [
+      "5.180.22.26"
+    ],
+    "ping": 340.3,
+    "network": "grpc"
+  },
+  {
+    "id": 16,
+    "name": "\ud83c\uddf9\ud83c\uddf7 \u0422\u0443\u0440\u0446\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "185.153.182.24",
+    "port": 443,
+    "ips": [
+      "185.153.182.24"
+    ],
+    "ping": 110.6,
+    "network": "grpc"
+  },
+  {
+    "id": 17,
+    "name": "\ud83c\udde6\ud83c\uddf9 \u0410\u0432\u0441\u0442\u0440\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 1",
+    "host": "5.181.21.119",
+    "port": 443,
+    "ips": [
+      "5.181.21.119"
+    ],
+    "ping": 69.2,
+    "network": "grpc"
+  },
+  {
+    "id": 18,
+    "name": "\ud83c\uddf1\ud83c\uddfa \u041b\u044e\u043a\u0441\u0435\u043c\u0431\u0443\u0440\u0433 | \u041e\u0431\u0445\u043e\u0434 2",
+    "host": "45.83.20.227",
+    "port": 443,
+    "ips": [
+      "45.83.20.227"
+    ],
+    "ping": 77.6,
+    "network": "tcp"
+  },
+  {
+    "id": 19,
+    "name": "\ud83c\uddf7\ud83c\uddf8 \u0421\u0435\u0440\u0431\u0438\u044f-2 | \u041e\u0431\u0445\u043e\u0434 2",
+    "host": "193.57.139.183",
+    "port": 443,
+    "ips": [
+      "193.57.139.183"
+    ],
+    "ping": 87.5,
+    "network": "tcp"
+  },
+  {
+    "id": 20,
+    "name": "\ud83c\uddfa\ud83c\uddf8 \u0421\u0428\u0410 | \u041e\u0431\u0445\u043e\u0434 2",
+    "host": "103.113.70.176",
+    "port": 443,
+    "ips": [
+      "103.113.70.176"
+    ],
+    "ping": 141.5,
+    "network": "tcp"
+  },
+  {
+    "id": 21,
+    "name": "\ud83c\uddf5\ud83c\uddf1 \u041f\u043e\u043b\u044c\u0448\u0430 | \u041e\u0431\u0445\u043e\u0434 2",
+    "host": "194.55.188.34",
+    "port": 443,
+    "ips": [
+      "194.55.188.34"
+    ],
+    "ping": 81.8,
+    "network": "tcp"
+  },
+  {
+    "id": 22,
+    "name": "\ud83c\uddf3\ud83c\uddf1 \u041d\u0438\u0434\u0435\u0440\u043b\u0430\u043d\u0434\u044b | \u041e\u0431\u0445\u043e\u0434 3",
+    "host": "netherlands.otiumvpn.ru",
+    "port": 443,
+    "ips": [
+      "45.134.218.165"
+    ],
+    "ping": 75.4,
+    "network": "tcp"
+  },
+  {
+    "id": 23,
+    "name": "\ud83c\udde9\ud83c\uddea \u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 3",
+    "host": "germany.otiumvpn.ru",
+    "port": 443,
+    "ips": [
+      "45.134.217.182"
+    ],
+    "ping": 67.2,
+    "network": "tcp"
+  },
+  {
+    "id": 24,
+    "name": "\ud83c\udde8\ud83c\udde6 \u041a\u0430\u043d\u0430\u0434\u0430 | \u041e\u0431\u0445\u043e\u0434 3",
+    "host": "canada.otiumvpn.ru",
+    "port": 443,
+    "ips": [
+      "85.208.108.235"
+    ],
+    "ping": null,
+    "network": "tcp"
+  },
+  {
+    "id": 25,
+    "name": "\ud83c\uddec\ud83c\udde7 \u0411\u0440\u0438\u0442\u0430\u043d\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 3",
+    "host": "britain.otiumvpn.ru",
+    "port": 443,
+    "ips": [
+      "5.180.30.38"
+    ],
+    "ping": 76.7,
+    "network": "tcp"
+  },
+  {
+    "id": 26,
+    "name": "\ud83c\udde9\ud83c\uddea \u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.134.217.240",
+    "port": 443,
+    "ips": [
+      "45.134.217.240"
+    ],
+    "ping": 68.1,
+    "network": "xhttp"
+  },
+  {
+    "id": 27,
+    "name": "\ud83c\udde7\ud83c\uddea \u0411\u0435\u043b\u044c\u0433\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.120.179.103",
+    "port": 443,
+    "ips": [
+      "45.120.179.103"
+    ],
+    "ping": 80.2,
+    "network": "xhttp"
+  },
+  {
+    "id": 28,
+    "name": "\ud83c\udde6\ud83c\uddf1 \u0410\u043b\u0431\u0430\u043d\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.15.170.49",
+    "port": 443,
+    "ips": [
+      "45.15.170.49"
+    ],
+    "ping": 98.0,
+    "network": "tcp"
+  },
+  {
+    "id": 29,
+    "name": "\ud83c\udded\ud83c\uddf7 \u0425\u043e\u0440\u0432\u0430\u0442\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.136.129.83",
+    "port": 443,
+    "ips": [
+      "45.136.129.83"
+    ],
+    "ping": 108.0,
+    "network": "xhttp"
+  },
+  {
+    "id": 30,
+    "name": "\ud83c\uddf1\ud83c\uddf9 \u041b\u0438\u0442\u0432\u0430 | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.12.129.46",
+    "port": 443,
+    "ips": [
+      "45.12.129.46"
+    ],
+    "ping": 75.6,
+    "network": "xhttp"
+  },
+  {
+    "id": 31,
+    "name": "\ud83c\uddf2\ud83c\uddf0 \u041c\u0430\u043a\u0435\u0434\u043e\u043d\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.83.141.132",
+    "port": 443,
+    "ips": [
+      "45.83.141.132"
+    ],
+    "ping": 93.8,
+    "network": "tcp"
+  },
+  {
+    "id": 32,
+    "name": "\ud83c\uddf0\ud83c\uddf7 \u042e\u0436\u043d\u0430\u044f \u041a\u043e\u0440\u0435\u044f | \u041e\u0431\u0445\u043e\u0434 4",
+    "host": "45.136.149.96",
+    "port": 443,
+    "ips": [
+      "45.136.149.96"
+    ],
+    "ping": null,
+    "network": "xhttp"
+  },
+  {
+    "id": 33,
+    "name": "\ud83c\udde8\ud83c\udded \u0428\u0432\u0435\u0439\u0446\u0430\u0440\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 5",
+    "host": "45.82.254.79",
+    "port": 23,
+    "ips": [
+      "45.82.254.79"
+    ],
+    "ping": 77.3,
+    "network": "xhttp"
+  },
+  {
+    "id": 34,
+    "name": "\ud83c\udded\ud83c\uddfa \u0412\u0435\u043d\u0433\u0440\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 5",
+    "host": "86.104.75.91",
+    "port": 23,
+    "ips": [
+      "86.104.75.91"
+    ],
+    "ping": 75.0,
+    "network": "tcp"
+  },
+  {
+    "id": 35,
+    "name": "\ud83c\uddee\ud83c\uddf8 \u0418\u0441\u043b\u0430\u043d\u0434\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 5",
+    "host": "45.83.21.184",
+    "port": 23,
+    "ips": [
+      "45.83.21.184"
+    ],
+    "ping": 105.5,
+    "network": "xhttp"
+  },
+  {
+    "id": 36,
+    "name": "\ud83c\udde8\ud83c\uddff \u0427\u0435\u0445\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 5",
+    "host": "45.83.130.23",
+    "port": 23,
+    "ips": [
+      "45.83.130.23"
+    ],
+    "ping": null,
+    "network": "xhttp"
+  },
+  {
+    "id": 37,
+    "name": "\ud83c\uddee\ud83c\uddf1 \u0418\u0437\u0440\u0430\u0438\u043b\u044c | \u041e\u0431\u0445\u043e\u0434 5",
+    "host": "89.221.225.217",
+    "port": 23,
+    "ips": [
+      "89.221.225.217"
+    ],
+    "ping": 122.5,
+    "network": "xhttp"
+  },
+  {
+    "id": 38,
+    "name": "\ud83c\udde8\ud83c\uddff \u0427\u0435\u0445\u0438\u044f | \u041e\u0431\u0445\u043e\u0434 6 (\u0434\u0432\u043e\u0439\u043d\u043e\u0439)",
+    "host": "95.163.214.215",
+    "port": 443,
+    "ips": [
+      "95.163.214.215"
+    ],
+    "ping": null,
+    "network": "tcp"
+  }
+]

@@ -1,0 +1,179 @@
+{
+  "host": "192.168.0.11",
+  "port": 20101,
+  "started_at": 1777652361.3685398,
+  "probes": [
+    {
+      "name": "repeated_connect_x4",
+      "results": [
+        {
+          "i": 0,
+          "ok": true,
+          "err": null,
+          "ms": 8
+        },
+        {
+          "i": 1,
+          "ok": true,
+          "err": null,
+          "ms": 6
+        },
+        {
+          "i": 2,
+          "ok": true,
+          "err": null,
+          "ms": 3
+        },
+        {
+          "i": 3,
+          "ok": true,
+          "err": null,
+          "ms": 3
+        }
+      ]
+    },
+    {
+      "name": "long_silence_30s",
+      "closed_by_peer": false,
+      "recv_err": null,
+      "len": 0,
+      "preview": "",
+      "hex_head": ""
+    },
+    {
+      "name": "h2c_preface",
+      "closed_by_peer": true,
+      "recv_err": "[WinError 10054] Удаленный хост принудительно разорвал существующее подключение",
+      "len": 0,
+      "preview": "",
+      "hex_head": ""
+    },
+    {
+      "name": "tls_sni=None_alpn=h2+http/1.1",
+      "sni": null,
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=192.168.0.11_alpn=h2+http/1.1",
+      "sni": "192.168.0.11",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=Capsula-mini-03447D709FE0FBAE_alpn=h2+http/1.1",
+      "sni": "Capsula-mini-03447D709FE0FBAE",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=capsula-mini_alpn=h2+http/1.1",
+      "sni": "capsula-mini",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=marusia.mail.ru_alpn=h2+http/1.1",
+      "sni": "marusia.mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=voice.mail.ru_alpn=h2+http/1.1",
+      "sni": "voice.mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=marusia-api.mail.ru_alpn=h2+http/1.1",
+      "sni": "marusia-api.mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=device.marusia.mail.ru_alpn=h2+http/1.1",
+      "sni": "device.marusia.mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=vk.com_alpn=h2+http/1.1",
+      "sni": "vk.com",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=mail.ru_alpn=h2+http/1.1",
+      "sni": "mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=iot.mail.ru_alpn=h2+http/1.1",
+      "sni": "iot.mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=speaker.mail.ru_alpn=h2+http/1.1",
+      "sni": "speaker.mail.ru",
+      "alpns": [
+        "h2",
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=marusia.mail.ru_alpn=http/1.1",
+      "sni": "marusia.mail.ru",
+      "alpns": [
+        "http/1.1"
+      ],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_sni=marusia.mail.ru_alpn=",
+      "sni": "marusia.mail.ru",
+      "alpns": [],
+      "error": "RST: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    },
+    {
+      "name": "tls_slow_byte_by_byte",
+      "error": "ConnectionResetError: [WinError 10054] Удаленный хост принудительно разорвал существующее подключение"
+    }
+  ],
+  "elapsed_sec": 39.62
+}

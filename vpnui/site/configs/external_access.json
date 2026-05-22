@@ -1,0 +1,79 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "tag": "external-vless",
+      "listen": "0.0.0.0",
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "EXTERNAL_ACCESS_UUID",
+            "encryption": "none",
+            "flow": ""
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "dest": "www.google.com:443",
+          "serverNames": ["www.google.com"],
+          "privateKey": "PRIVATE_KEY",
+          "shortIds": ["SHORT_ID"]
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "vpn-out",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "YOUR_VPS_IP",
+            "port": 443,
+            "users": [
+              {
+                "id": "YOUR_VPS_UUID",
+                "encryption": "none",
+                "flow": "xtls-rprx-vision"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "serverName": "SERVER_NAME",
+          "fingerprint": "chrome",
+          "publicKey": "PUBLIC_KEY",
+          "shortId": "",
+          "spiderX": "/"
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": ["external-vless"],
+        "outboundTag": "vpn-out"
+      }
+    ]
+  }
+}

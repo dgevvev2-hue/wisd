@@ -1,0 +1,97 @@
+{
+  "log": {
+    "loglevel": "info",
+    "access": "/var/tmp/vpnui/xray.access.log"
+  },
+  "inbounds": [
+    {
+      "tag": "socks-in",
+      "listen": "192.168.0.1",
+      "port": 1080,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": false
+      }
+    },
+    {
+      "tag": "http-in",
+      "listen": "192.168.0.1",
+      "port": 1081,
+      "protocol": "http",
+      "settings": {}
+    },
+    {
+      "tag": "redir-in",
+      "listen": "0.0.0.0",
+      "port": 12345,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "network": "tcp",
+        "followRedirect": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "vpn-out",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "45.84.0.239",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d45c0d6-3efb-4eef-9127-facde6e3975a",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "security": "reality",
+        "realitySettings": {
+          "serverName": "viennaairport",
+          "fingerprint": "chrome",
+          "publicKey": "qB_eMu3ZO_wGITnyIqJ7Kt39-h9oHFnHlQQEqA-r3VA",
+          "shortId": "",
+          "spiderX": "/"
+        },
+        "grpcSettings": {
+          "serviceName": "grpc",
+          "multiMode": false
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "direct",
+        "domain": [
+          "domain:music.yandex.ru",
+          "domain:yastatic.net",
+          "domain:yandex.net",
+          "domain:yandex.ru"
+        ],
+        "tag": "direct-yandex"
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "log": {
+    "loglevel": "debug"
+  },
+  "inbounds": [
+    {
+      "tag": "http",
+      "listen": "192.168.0.1",
+      "port": 1081,
+      "protocol": "http",
+      "settings": {
+        "timeout": 0
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    }
+  ]
+}

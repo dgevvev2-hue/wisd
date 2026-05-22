@@ -1,0 +1,90 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "tag": "bot-socks",
+      "listen": "127.0.0.1",
+      "port": 1090,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": false
+      }
+    },
+    {
+      "tag": "bot-http",
+      "listen": "127.0.0.1",
+      "port": 1091,
+      "protocol": "http",
+      "settings": {}
+    },
+    {
+      "tag": "bot-redir",
+      "listen": "0.0.0.0",
+      "port": 12346,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "network": "tcp",
+        "followRedirect": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "tag": "vpn-out",
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "91.219.227.28",
+            "port": 443,
+            "users": [
+              {
+                "id": "7d45c0d6-3efb-4eef-9127-facde6e3975a",
+                "encryption": "none"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "grpc",
+        "security": "reality",
+        "realitySettings": {
+          "serverName": "viennaairport",
+          "fingerprint": "chrome",
+          "publicKey": "qB_eMu3ZO_wGITnyIqJ7Kt39-h9oHFnHlQQEqA-r3VA",
+          "shortId": "",
+          "spiderX": "/"
+        },
+        "grpcSettings": {
+          "serviceName": "grpc",
+          "multiMode": false
+        }
+      }
+    },
+    {
+      "tag": "direct",
+      "protocol": "freedom"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "vpn-out",
+        "network": "tcp"
+      }
+    ]
+  }
+}

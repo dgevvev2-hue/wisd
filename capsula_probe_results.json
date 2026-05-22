@@ -1,0 +1,1992 @@
+{
+  "host": "192.168.0.11",
+  "started_at": 1777651805.7580166,
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "port80": {
+    "all": [
+      {
+        "method": "GET",
+        "path": "/info",
+        "status": 200,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "application/json",
+          "Content-Length": "204"
+        },
+        "body_len": 204,
+        "body_preview": "{\n    \"bt_mac\": \"68:4E:05:68:AA:34\",\n    \"device_id\": \":c:d:capsula_mini:ea9928e2b4fe131b33673fdbac263d77\",\n    \"serial\": \"03447D709FE0FBAE\",\n    \"version\": \"44.90\",\n    \"wifi_mac\": \"68:4E:05:68:35:04\"\n}\n"
+      },
+      {
+        "method": "GET",
+        "path": "/status",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/state",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/version",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/about",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/sysinfo",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/devinfo",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/dev_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/device_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/info_full",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/full_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/uptime",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/stats",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wifi",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wifi_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wifi_status",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/network",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/net_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/ip_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/ifconfig",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/audio",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/audio_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/playback",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/player",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/volume",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/track",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/now_playing",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/state_audio",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/bt",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/bt_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/bt_status",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/bluetooth",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/update",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/ota",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/firmware",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/fw_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/check_update",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/log",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/logs",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/debug",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/dmesg",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/syslog",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/journal",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/config",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/settings",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/cfg",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/voice",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/asr",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/tts",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/marusya",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/marusia",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/assistant",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wakeword",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wake_word",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/mic",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/skill",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/skills",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/api",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/api/info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/v1/info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/rpc",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/jsonrpc",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/eapi",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/led",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/leds",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/display",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/screen",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/clock",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/time",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/light",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/play",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/pause",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/stop",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/next",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/prev",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/mute",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/unmute",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/volume_up",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/volume_down",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/iot",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/devices",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/smart_home",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/zigbee",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/discovery",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/auth",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/pair",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/pairing",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/token",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/cert",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/account",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/user",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/reboot",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/restart",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/shutdown",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/poweroff",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/factory_reset",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/factory-reset",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/reset",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/ping",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/healthz",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/readyz",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/livez",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/zc",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/zeroconf",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/spotify",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/spotify_info",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/description.xml",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/setup.xml",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/.well-known/spotify-connect",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/cmd",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/command",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/exec",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/shell",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/run",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/file",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/files",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/fs",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/storage",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/get_file",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/read",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/download",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/upload",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/diag",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/diagnostics",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/ping_test",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/traceroute",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/nslookup",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/test_net",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/speedtest",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wifi_setup",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/wifi_connect",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/connect_wifi",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/setup",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/set_wifi",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/save_config",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/apply",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/enable_ssh",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/ssh",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/dropbear",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/telnet",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/dev_mode",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/developer",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/service_mode",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/info?path=/etc/passwd",
+        "status": 200,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "application/json",
+          "Content-Length": "204"
+        },
+        "body_len": 204,
+        "body_preview": "{\n    \"bt_mac\": \"68:4E:05:68:AA:34\",\n    \"device_id\": \":c:d:capsula_mini:ea9928e2b4fe131b33673fdbac263d77\",\n    \"serial\": \"03447D709FE0FBAE\",\n    \"version\": \"44.90\",\n    \"wifi_mac\": \"68:4E:05:68:35:04\"\n}\n"
+      },
+      {
+        "method": "GET",
+        "path": "/info?file=/etc/passwd",
+        "status": 200,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "application/json",
+          "Content-Length": "204"
+        },
+        "body_len": 204,
+        "body_preview": "{\n    \"bt_mac\": \"68:4E:05:68:AA:34\",\n    \"device_id\": \":c:d:capsula_mini:ea9928e2b4fe131b33673fdbac263d77\",\n    \"serial\": \"03447D709FE0FBAE\",\n    \"version\": \"44.90\",\n    \"wifi_mac\": \"68:4E:05:68:35:04\"\n}\n"
+      },
+      {
+        "method": "GET",
+        "path": "/log?file=../../etc/passwd",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      },
+      {
+        "method": "GET",
+        "path": "/log?path=../../../../etc/passwd",
+        "status": 404,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "text/plain",
+          "Content-Length": "18"
+        },
+        "body_len": 18,
+        "body_preview": "command not found\n"
+      }
+    ],
+    "interesting": [
+      {
+        "method": "GET",
+        "path": "/info",
+        "status": 200,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "application/json",
+          "Content-Length": "204"
+        },
+        "body_len": 204,
+        "body_preview": "{\n    \"bt_mac\": \"68:4E:05:68:AA:34\",\n    \"device_id\": \":c:d:capsula_mini:ea9928e2b4fe131b33673fdbac263d77\",\n    \"serial\": \"03447D709FE0FBAE\",\n    \"version\": \"44.90\",\n    \"wifi_mac\": \"68:4E:05:68:35:04\"\n}\n"
+      },
+      {
+        "method": "GET",
+        "path": "/info?path=/etc/passwd",
+        "status": 200,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "application/json",
+          "Content-Length": "204"
+        },
+        "body_len": 204,
+        "body_preview": "{\n    \"bt_mac\": \"68:4E:05:68:AA:34\",\n    \"device_id\": \":c:d:capsula_mini:ea9928e2b4fe131b33673fdbac263d77\",\n    \"serial\": \"03447D709FE0FBAE\",\n    \"version\": \"44.90\",\n    \"wifi_mac\": \"68:4E:05:68:35:04\"\n}\n"
+      },
+      {
+        "method": "GET",
+        "path": "/info?file=/etc/passwd",
+        "status": 200,
+        "reason": "status",
+        "headers": {
+          "Connection": "close",
+          "Content-Type": "application/json",
+          "Content-Length": "204"
+        },
+        "body_len": 204,
+        "body_preview": "{\n    \"bt_mac\": \"68:4E:05:68:AA:34\",\n    \"device_id\": \":c:d:capsula_mini:ea9928e2b4fe131b33673fdbac263d77\",\n    \"serial\": \"03447D709FE0FBAE\",\n    \"version\": \"44.90\",\n    \"wifi_mac\": \"68:4E:05:68:35:04\"\n}\n"
+      }
+    ],
+    "boring_404": 146,
+    "total_tried": 149,
+    "aborted": false,
+    "tier": 3
+  },
+  "elapsed_sec": 393.27
+}

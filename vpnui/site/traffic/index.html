@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Traffic Monitor</title>
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-mark">TM</div>
+      <div>
+        <strong>Traffic Monitor</strong>
+        <span>Аналитика посещённых сайтов</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="button ghost" id="refreshButton">Обновить</button>
+      <button class="button ghost" id="exportButton">Экспорт</button>
+      <button class="button danger" id="clearButton">Очистить историю</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Web Activity</p>
+        <h1>Обзор интернет-активности</h1>
+        <p class="hero-copy">Отслеживайте посещённые сайты, количество запросов, время активности и объём трафика по клиентам.</p>
+      </div>
+      <div class="live-badge">
+        <span class="pulse"></span>
+        <span>Мониторинг активен</span>
+        <b>Live</b>
+      </div>
+    </section>
+
+    <section class="stats-grid" id="statsGrid" aria-live="polite"></section>
+
+    <section class="content-grid">
+      <article class="panel chart-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Активность по времени</h2>
+            <p>Количество посещений и объём трафика по последним событиям.</p>
+          </div>
+          <div class="legend">
+            <span><i class="dot blue"></i>Посещения</span>
+            <span><i class="dot green"></i>Трафик</span>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <svg id="activityChart" viewBox="0 0 760 280" role="img" aria-label="График активности"></svg>
+          <div class="chart-empty" id="chartEmpty">Новые посещения появятся здесь автоматически</div>
+        </div>
+      </article>
+
+      <aside class="panel top-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Самые посещаемые сайты</h2>
+            <p>Топ доменов по текущей истории.</p>
+          </div>
+        </div>
+        <div class="top-sites" id="topSites"></div>
+      </aside>
+    </section>
+
+    <section class="content-grid lower">
+      <article class="panel table-panel">
+        <div class="panel-head table-head">
+          <div>
+            <h2>Посещённые сайты</h2>
+            <p>Поиск, фильтрация и сортировка активности.</p>
+          </div>
+          <div class="filters">
+            <input id="searchInput" class="input" placeholder="Поиск сайта">
+            <select id="categoryFilter" class="input">
+              <option>Все</option>
+              <option>Видео</option>
+              <option>Поиск</option>
+              <option>Соцсети</option>
+              <option>Работа</option>
+              <option>Разработка</option>
+              <option>Новости</option>
+              <option>Реклама</option>
+              <option>Неизвестно</option>
+            </select>
+            <select id="statusFilter" class="input">
+              <option>Все</option>
+              <option>Разрешён</option>
+              <option>Подозрительный</option>
+              <option>Заблокирован</option>
+            </select>
+            <select id="sortSelect" class="input">
+              <option value="visits">По посещениям</option>
+              <option value="traffic">По трафику</option>
+              <option value="lastVisit">По последнему визиту</option>
+            </select>
+          </div>
+        </div>
+        <div class="table" id="sitesTable"></div>
+      </article>
+
+      <aside class="panel live-panel">
+        <div class="panel-head">
+          <div>
+            <h2>Live traffic</h2>
+            <p>Последние события в реальном времени.</p>
+          </div>
+        </div>
+        <div class="live-list" id="liveTraffic"></div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="clearModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="clearTitle">
+      <div class="modal-icon">!</div>
+      <h2 id="clearTitle">Очистить историю?</h2>
+      <p>Вы уверены, что хотите очистить историю посещений? Это действие нельзя отменить.</p>
+      <div class="modal-actions">
+        <button class="button ghost" id="cancelClear">Отмена</button>
+        <button class="button danger" id="confirmClear">Очистить</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>

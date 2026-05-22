@@ -1,0 +1,6 @@
+HTTP/1.1 302 Found
+Content-Type: text/html
+Accept-Ranges: bytes
+Location: /login.htm
+X-Pad: avoid browser bug
+
