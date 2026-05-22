@@ -163,10 +163,13 @@ $('#powerBtn').addEventListener('click', async () => {
 $('#modeDirect').addEventListener('click', async () => {
     state.mode = 'direct';
     state.selectedId = null;
-    if (state.vpn && state.vpn.enabled) {
+    try {
         await api('vpn.cgi?action=up&mode=direct');
+        toast('Direct');
+    } catch (e) {
+        toast(e.message, true);
     }
-    renderStatus();
+    await refreshStatus();
 });
 
 $('#modeTunnel').addEventListener('click', () => {
@@ -330,10 +333,8 @@ async function selectNode(id) {
     if (id === '__direct__') {
         state.mode = 'direct';
         state.selectedId = null;
-        if (state.vpn && state.vpn.enabled) {
-            try { await api('vpn.cgi?action=up&mode=direct'); toast('Direct'); }
-            catch (e) { toast(e.message, true); }
-        }
+        try { await api('vpn.cgi?action=up&mode=direct'); toast('Direct'); }
+        catch (e) { toast(e.message, true); }
         await refreshStatus();
         return;
     }
