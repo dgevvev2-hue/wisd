@@ -360,7 +360,9 @@ async function loadVps() {
             box.innerHTML = `<div class="empty">${escapeHtml(r.message || 'не настроен')}</div>`;
             return;
         }
+        const p = r.proxy || {};
         box.innerHTML = `
+            <h3 style="margin:0 0 10px">VLESS-Reality (туннель)</h3>
             <div class="row"><span>Адрес</span><b>${escapeHtml(r.host)}:${r.port}</b></div>
             <div class="row"><span>Протокол</span><b>VLESS · Reality</b></div>
             <div class="row"><span>UUID</span><b class="mono">${escapeHtml(r.uuid)}</b></div>
@@ -372,10 +374,32 @@ async function loadVps() {
             <div class="row" style="justify-content:flex-end;gap:8px">
                 <button id="copyUrl" class="btn">Копировать VLESS</button>
             </div>
+
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+            <h3 style="margin:0 0 10px">SOCKS5 / HTTP прокси</h3>
+            <div class="row"><span>SOCKS5</span><b class="mono">${escapeHtml(r.host)}:${p.socksPort || ''}</b></div>
+            <div class="row"><span>HTTP</span><b class="mono">${escapeHtml(r.host)}:${p.httpPort || ''}</b></div>
+            <div class="row"><span>Логин</span><b class="mono">${escapeHtml(p.user || '')}</b></div>
+            <div class="row"><span>Пароль</span><b class="mono">${escapeHtml(p.pass || '')}</b></div>
+            <div class="url" id="socksUrl">${escapeHtml(p.socksUrl || '')}</div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+                <button id="copySocks" class="btn">SOCKS5 URL</button>
+                <button id="copyHttp" class="btn">HTTP URL</button>
+                <button id="copyUser" class="btn">Логин</button>
+                <button id="copyPass" class="btn">Пароль</button>
+            </div>
+            <div class="empty" style="margin-top:8px;font-size:12px">
+                В отличие от VLESS, обычный SOCKS5/HTTP не маскируется — провайдер видит, что это прокси.
+                Используй для отдельных приложений (браузер, qBittorrent, curl, Python requests и т.д.).
+            </div>
         `;
-        $('#copyUrl').addEventListener('click', () => {
-            navigator.clipboard.writeText(r.url).then(() => toast('Скопировано'));
-        });
+        const copy = (txt) => navigator.clipboard.writeText(txt).then(() => toast('Скопировано'));
+        $('#copyUrl').addEventListener('click', () => copy(r.url));
+        $('#copySocks').addEventListener('click', () => copy(p.socksUrl || ''));
+        $('#copyHttp').addEventListener('click', () => copy(p.httpUrl || ''));
+        $('#copyUser').addEventListener('click', () => copy(p.user || ''));
+        $('#copyPass').addEventListener('click', () => copy(p.pass || ''));
     } catch (e) {
         box.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
     }

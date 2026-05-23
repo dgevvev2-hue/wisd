@@ -72,7 +72,7 @@ if [[ ! -x "$XRAY_BIN" ]] || ! "$XRAY_BIN" version 2>/dev/null | grep -q "$XRAY_
     rm -rf "$tmp"
 fi
 
-step "Generate VLESS-Reality server keys"
+step "Generate VLESS-Reality server keys + proxy credentials"
 SERVER_FILE=$STATE_DIR/server.json
 if [[ ! -s "$SERVER_FILE" ]]; then
     keys=$("$XRAY_BIN" x25519)
@@ -83,6 +83,8 @@ if [[ ! -s "$SERVER_FILE" ]]; then
     pubip=$(curl -s --max-time 4 https://ifconfig.io 2>/dev/null \
             || ip -4 -o addr show scope global | awk '{print $4}' | head -1 | cut -d/ -f1)
     server_name=${WISD_SNI:-www.cloudflare.com}
+    proxy_user=wisd_$(head -c 4 /dev/urandom | xxd -p -c 8)
+    proxy_pass=$(head -c 18 /dev/urandom | base64 | tr -d '+/=' | head -c 24)
     jq -n --arg uuid "$uuid" \
           --arg pub "$pub" \
           --arg priv "$priv" \
@@ -90,15 +92,33 @@ if [[ ! -s "$SERVER_FILE" ]]; then
           --arg sni "$server_name" \
           --arg host "$pubip" \
           --argjson port 443 \
-          --arg flow "xtls-rprx-vision" '
+          --arg flow "xtls-rprx-vision" \
+          --arg pu "$proxy_user" \
+          --arg pp "$proxy_pass" \
+          --argjson sp 1080 \
+          --argjson hp 1081 '
         {uuid:$uuid, publicKey:$pub, privateKey:$priv,
-         shortId:$sid, serverName:$sni, host:$host, port:$port, flow:$flow}
+         shortId:$sid, serverName:$sni, host:$host, port:$port, flow:$flow,
+         proxyUser:$pu, proxyPass:$pp, socksPort:$sp, httpPort:$hp}
     ' > "$SERVER_FILE"
     chown wisd:wisd "$SERVER_FILE"
     chmod 0640 "$SERVER_FILE"
 fi
 
-step "Seed initial xray.json (direct mode)"
+# Backfill proxy credentials for installs predating this feature.
+if ! jq -e '.proxyUser' "$SERVER_FILE" >/dev/null 2>&1; then
+    proxy_user=wisd_$(head -c 4 /dev/urandom | xxd -p -c 8)
+    proxy_pass=$(head -c 18 /dev/urandom | base64 | tr -d '+/=' | head -c 24)
+    tmp=$(mktemp)
+    jq --arg pu "$proxy_user" --arg pp "$proxy_pass" \
+       --argjson sp 1080 --argjson hp 1081 \
+       '. + {proxyUser:$pu, proxyPass:$pp, socksPort:$sp, httpPort:$hp}' \
+       "$SERVER_FILE" > "$tmp" && mv "$tmp" "$SERVER_FILE"
+    chown wisd:wisd "$SERVER_FILE"
+    chmod 0640 "$SERVER_FILE"
+fi
+
+step "Seed initial xray.json (direct mode, public auth-protected proxy)"
 XRAY_CFG=$STATE_DIR/xray.json
 if [[ ! -s "$XRAY_CFG" ]]; then
     s_uuid=$(jq -r '.uuid' "$SERVER_FILE")
@@ -106,13 +126,21 @@ if [[ ! -s "$XRAY_CFG" ]]; then
     s_short=$(jq -r '.shortId' "$SERVER_FILE")
     s_sni=$(jq -r '.serverName' "$SERVER_FILE")
     s_flow=$(jq -r '.flow' "$SERVER_FILE")
+    s_pu=$(jq -r '.proxyUser' "$SERVER_FILE")
+    s_pp=$(jq -r '.proxyPass' "$SERVER_FILE")
+    s_sp=$(jq -r '.socksPort // 1080' "$SERVER_FILE")
+    s_hp=$(jq -r '.httpPort // 1081' "$SERVER_FILE")
     jq -n --arg log "$LOG_DIR/xray.log" \
           --arg access "$LOG_DIR/access.log" \
           --arg uuid "$s_uuid" \
           --arg priv "$s_priv" \
           --arg short "$s_short" \
           --arg sni "$s_sni" \
-          --arg flow "$s_flow" '
+          --arg flow "$s_flow" \
+          --arg pu "$s_pu" \
+          --arg pp "$s_pp" \
+          --argjson sp "$s_sp" \
+          --argjson hp "$s_hp" '
     {
       log: {loglevel:"warning", error:$log, access:$access},
       inbounds: [
@@ -122,10 +150,10 @@ if [[ ! -s "$XRAY_CFG" ]]; then
             realitySettings:{show:false, dest:($sni+":443"), xver:0,
               serverNames:[$sni], privateKey:$priv, shortIds:[$short]}},
          sniffing:{enabled:true, destOverride:["http","tls","quic"]}},
-        {tag:"socks-in", listen:"127.0.0.1", port:1080, protocol:"socks",
-         settings:{auth:"noauth", udp:true}},
-        {tag:"http-in", listen:"127.0.0.1", port:1081, protocol:"http",
-         settings:{}}
+        {tag:"socks-in", listen:"0.0.0.0", port:$sp, protocol:"socks",
+         settings:{auth:"password", accounts:[{user:$pu, pass:$pp}], udp:true}},
+        {tag:"http-in", listen:"0.0.0.0", port:$hp, protocol:"http",
+         settings:{accounts:[{user:$pu, pass:$pp}]}}
       ],
       outbounds: [
         {tag:"direct", protocol:"freedom", settings:{}},
@@ -173,8 +201,12 @@ visudo -c -f /etc/sudoers.d/wisd-cgi
 step "Open firewall ports (if ufw is active)"
 if command -v ufw >/dev/null 2>&1; then
     ufw status | grep -q "Status: active" && {
+        s_sp=$(jq -r '.socksPort // 1080' "$SERVER_FILE")
+        s_hp=$(jq -r '.httpPort // 1081' "$SERVER_FILE")
         ufw allow 80/tcp >/dev/null
         ufw allow 443/tcp >/dev/null
+        ufw allow "$s_sp/tcp" >/dev/null
+        ufw allow "$s_hp/tcp" >/dev/null
         ufw reload >/dev/null
     }
 fi

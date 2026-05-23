@@ -19,6 +19,10 @@ server_name=$(jq -r '.serverName // "www.cloudflare.com"' "$WISD_SERVER_FILE")
 port=$(jq -r '.port // 443' "$WISD_SERVER_FILE")
 host=$(jq -r '.host // ""' "$WISD_SERVER_FILE")
 flow=$(jq -r '.flow // "xtls-rprx-vision"' "$WISD_SERVER_FILE")
+proxy_user=$(jq -r '.proxyUser // ""' "$WISD_SERVER_FILE")
+proxy_pass=$(jq -r '.proxyPass // ""' "$WISD_SERVER_FILE")
+socks_port=$(jq -r '.socksPort // 1080' "$WISD_SERVER_FILE")
+http_port=$(jq -r '.httpPort // 1081' "$WISD_SERVER_FILE")
 
 if [[ -z "$host" || "$host" == "null" ]]; then
     host=$(curl -s --max-time 2 https://ifconfig.io 2>/dev/null)
@@ -26,6 +30,23 @@ if [[ -z "$host" || "$host" == "null" ]]; then
 fi
 
 vless_url="vless://${uuid}@${host}:${port}?encryption=none&security=reality&sni=${server_name}&fp=chrome&pbk=${public_key}&sid=${short_id}&type=tcp&flow=${flow}#wisd-${host}"
+
+# URL-encode user/pass for curl-style proxy URLs (basic: replace common specials).
+url_encode() {
+    local s=$1 i c out=""
+    for ((i=0; i<${#s}; i++)); do
+        c=${s:i:1}
+        case "$c" in
+            [A-Za-z0-9._~-]) out+="$c" ;;
+            *) printf -v c '%%%02X' "'$c"; out+="$c" ;;
+        esac
+    done
+    printf '%s' "$out"
+}
+pu_enc=$(url_encode "$proxy_user")
+pp_enc=$(url_encode "$proxy_pass")
+socks_url="socks5://${pu_enc}:${pp_enc}@${host}:${socks_port}"
+http_url="http://${pu_enc}:${pp_enc}@${host}:${http_port}"
 
 cat <<JSON
 {
@@ -37,6 +58,14 @@ cat <<JSON
   "shortId": "$(json_escape "$short_id")",
   "serverName": "$(json_escape "$server_name")",
   "flow": "$(json_escape "$flow")",
-  "url": "$(json_escape "$vless_url")"
+  "url": "$(json_escape "$vless_url")",
+  "proxy": {
+    "socksPort": $socks_port,
+    "httpPort": $http_port,
+    "user": "$(json_escape "$proxy_user")",
+    "pass": "$(json_escape "$proxy_pass")",
+    "socksUrl": "$(json_escape "$socks_url")",
+    "httpUrl": "$(json_escape "$http_url")"
+  }
 }
 JSON

@@ -10,7 +10,7 @@ VPN-панель и VLESS-туннель для x86_64 Linux VPS.
 
 ## Что это делает
 
-- Поднимает на VPS **Xray-сервер**: VLESS inbound на :443 (TLS/Reality), плюс локальные SOCKS5 (`:1080`) и HTTP (`:1081`).
+- Поднимает на VPS **Xray-сервер**: VLESS inbound на :443 (TLS/Reality), плюс публичные SOCKS5 (`:1080`) и HTTP (`:1081`) с парольной аутентификацией.
 - Веб-панель умеет:
     - Включать/выключать туннель.
     - Переключать режим **Direct** (трафик уходит с IP самого VPS) ↔ **Tunnel** (трафик уходит через выбранный upstream VLESS-узел).
@@ -48,8 +48,8 @@ sudo bash deploy/install.sh
                                      ▼
             systemd: wisd-xray.service ──► xray
                                             ├── inbound  :443 VLESS-Reality (для клиентов)
-                                            ├── inbound  :1080 SOCKS5  (локально, 127.0.0.1)
-                                            ├── inbound  :1081 HTTP    (локально, 127.0.0.1)
+                                            ├── inbound  :1080 SOCKS5  (0.0.0.0, user/pass из server.json)
+                                            ├── inbound  :1081 HTTP    (0.0.0.0, user/pass из server.json)
                                             └── outbound:
                                                  ├── freedom (Direct, выход с IP VPS)
                                                  └── vless   (Tunnel, через upstream)

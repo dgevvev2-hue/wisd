@@ -61,8 +61,9 @@ build_config() {
     local mode=$1
     local nid=${2:-}
 
-    # Load server-side params (the VLESS inbound on :443).
+    # Load server-side params (the VLESS inbound on :443 + the SOCKS/HTTP proxy).
     local s_uuid s_pubkey s_privkey s_shortid s_sni s_flow s_port
+    local s_proxy_user s_proxy_pass s_socks_port s_http_port
     s_uuid=$(jq -r '.uuid // ""' "$WISD_SERVER_FILE")
     s_pubkey=$(jq -r '.publicKey // ""' "$WISD_SERVER_FILE")
     s_privkey=$(jq -r '.privateKey // ""' "$WISD_SERVER_FILE")
@@ -70,6 +71,10 @@ build_config() {
     s_sni=$(jq -r '.serverName // "www.cloudflare.com"' "$WISD_SERVER_FILE")
     s_flow=$(jq -r '.flow // "xtls-rprx-vision"' "$WISD_SERVER_FILE")
     s_port=$(jq -r '.port // 443' "$WISD_SERVER_FILE")
+    s_proxy_user=$(jq -r '.proxyUser // ""' "$WISD_SERVER_FILE")
+    s_proxy_pass=$(jq -r '.proxyPass // ""' "$WISD_SERVER_FILE")
+    s_socks_port=$(jq -r '.socksPort // 1080' "$WISD_SERVER_FILE")
+    s_http_port=$(jq -r '.httpPort // 1081' "$WISD_SERVER_FILE")
 
     local out_node='{}'
     if [[ "$mode" == "tunnel" ]]; then
@@ -88,6 +93,10 @@ build_config() {
           --arg sSni "$s_sni" \
           --arg sFlow "$s_flow" \
           --argjson sPort "$s_port" \
+          --arg sPu "$s_proxy_user" \
+          --arg sPp "$s_proxy_pass" \
+          --argjson sSp "$s_socks_port" \
+          --argjson sHp "$s_http_port" \
           --arg mode "$mode" \
           --argjson node "$out_node" '
     def server_inbound:
@@ -114,12 +123,26 @@ build_config() {
         },
         sniffing: { enabled: true, destOverride: ["http","tls","quic"] }
       };
-    def local_socks:
-      { tag: "socks-in", listen: "127.0.0.1", port: 1080,
-        protocol: "socks", settings: { auth: "noauth", udp: true } };
-    def local_http:
-      { tag: "http-in", listen: "127.0.0.1", port: 1081,
-        protocol: "http", settings: {} };
+    def proxy_socks:
+      { tag: "socks-in", listen: "0.0.0.0", port: $sSp,
+        protocol: "socks",
+        settings: (
+          if ($sPu // "") != "" and ($sPp // "") != "" then
+            { auth: "password", accounts: [{user:$sPu, pass:$sPp}], udp: true }
+          else
+            { auth: "noauth", udp: true }
+          end )
+      };
+    def proxy_http:
+      { tag: "http-in", listen: "0.0.0.0", port: $sHp,
+        protocol: "http",
+        settings: (
+          if ($sPu // "") != "" and ($sPp // "") != "" then
+            { accounts: [{user:$sPu, pass:$sPp}] }
+          else
+            {}
+          end )
+      };
     def freedom_out:
       { tag: "direct", protocol: "freedom", settings: {} };
     def blocked_out:
@@ -170,7 +193,7 @@ build_config() {
       };
     {
       log: { loglevel: "warning", error: $log, access: $access },
-      inbounds: [ server_inbound, local_socks, local_http ],
+      inbounds: [ server_inbound, proxy_socks, proxy_http ],
       outbounds: (
         if $mode == "tunnel" then
           [ vless_outbound($node), freedom_out, blocked_out ]
