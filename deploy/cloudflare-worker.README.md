@@ -51,8 +51,18 @@ That hostname goes into your client URL below.
 
 ## Client URL
 
-The wisd panel ("Этот VPS" tab) generates the full client URL after you
-plug the Worker hostname into `server.json` — or build it manually:
+After deploy, write the Worker hostname into `server.json` on the VPS so the
+panel generates the URL automatically:
+
+```bash
+ssh root@<vps>
+jq --arg h 'wisd-relay.<account>.workers.dev' '.cfWorkerHost = $h' \
+    /var/lib/wisd/server.json > /tmp/s.json && mv /tmp/s.json /var/lib/wisd/server.json
+chown wisd:wisd /var/lib/wisd/server.json && chmod 0640 /var/lib/wisd/server.json
+```
+
+The panel ("Этот VPS" tab) will now show a "VLESS-WS via CF" section with a
+copy button. Or build the URL manually:
 
 ```
 vless://<UUID>@<worker-host>:443?encryption=none&security=tls&type=ws&path=<wsPath>&host=<worker-host>&sni=<worker-host>&fp=chrome#wisd-cf-ws
@@ -82,3 +92,16 @@ Limitations:
   per request — plenty for VPN forwarding, since per-request CPU is tiny).
 - Cloudflare can revoke the Worker if it's used for clearly abusive
   traffic. Keep your Worker private; don't share the URL publicly.
+
+## Why `<dashed-ip>.sslip.io`?
+
+Cloudflare's Workers runtime refuses outbound `fetch()` to bare-IP HTTP
+servers — it returns "Direct IP access not allowed" (CF code 1003). To
+work around this without owning a domain, we resolve the VPS via
+[sslip.io](https://sslip.io)'s magic DNS: `194-33-61-218.sslip.io` always
+resolves to `194.33.61.218`. The Worker sees it as a hostname (legal) and
+nginx on the VPS happily accepts the connection because it matches the
+default server block.
+
+If you ever point a real domain at the VPS (e.g. `vmpprota.biz`), set
+`VPS_HOST` to that domain in `cloudflare-worker.js` and skip sslip.io.
