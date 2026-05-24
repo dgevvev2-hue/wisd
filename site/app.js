@@ -92,6 +92,8 @@ $$('.tab').forEach(t => t.addEventListener('click', () => {
     if (page === 'vpsPage') loadVps();
     if (page === 'systemPage') loadSystem();
     if (page === 'rulesPage') loadRules();
+    if (page === 'trafficPage') openTraffic();
+    else stopTrafficPolling();
 }));
 
 /* ---------- theme ---------- */
@@ -392,6 +394,26 @@ async function loadVps() {
         const t = r.tuic || {};
         const s = r.shadowtls || {};
         const w = r.ws || {};
+        let subInfo = {};
+        try { subInfo = await api('sub-info.cgi'); } catch (_) {}
+        const subSection = subInfo.base ? `
+            <h3 style="margin:0 0 6px">Подписка для клиента — один URL, все 5 каналов</h3>
+            <div class="empty" style="margin:0 0 10px;font-size:12px">
+                Вставь эту ссылку в Hiddify / v2rayNG / NekoBox / Karing один раз — клиент сам подтянет все транспорты
+                (VLESS-Reality, Hysteria2, TUIC, CF-WS, WS-direct). При обновлении сервера достаточно нажать в клиенте «Refresh» —
+                новые ключи приедут автоматически.
+            </div>
+            <div class="row"><span>URL (base64)</span><b></b></div>
+            <div class="url" id="subUrl">${escapeHtml(subInfo.base)}</div>
+            <div class="row" style="justify-content:flex-end;gap:8px;flex-wrap:wrap">
+                <button id="copySub" class="btn primary">Копировать URL</button>
+                <button id="copySubText" class="btn">URL (plain)</button>
+                <button id="copySubSingbox" class="btn">URL (sing-box)</button>
+                <button id="rotateSub" class="btn">Сменить токен</button>
+            </div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+        ` : '';
+
         const hy2Section = h.url ? `
             <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
 
@@ -474,6 +496,7 @@ async function loadVps() {
             </div>
         ` : '';
         box.innerHTML = `
+            ${subSection}
             <h3 style="margin:0 0 10px">VLESS-Reality (TCP — основной туннель)</h3>
             <div class="row"><span>Адрес</span><b>${escapeHtml(r.host)}:${r.port}</b></div>
             <div class="row"><span>Протокол</span><b>VLESS · Reality</b></div>
@@ -547,8 +570,161 @@ async function loadVps() {
         if (copyWsDirect) copyWsDirect.addEventListener('click', (e) => copy(w.directUrl || '', e));
         const copyWsCf = $('#copyWsCf');
         if (copyWsCf) copyWsCf.addEventListener('click', (e) => copy(w.cfUrl || '', e));
+
+        const copySub = $('#copySub');
+        if (copySub) copySub.addEventListener('click', (e) => copy(subInfo.base || '', e));
+        const copySubText = $('#copySubText');
+        if (copySubText) copySubText.addEventListener('click', (e) => copy((subInfo.formats && subInfo.formats.text) || '', e));
+        const copySubSingbox = $('#copySubSingbox');
+        if (copySubSingbox) copySubSingbox.addEventListener('click', (e) => copy((subInfo.formats && subInfo.formats.singbox) || '', e));
+        const rotateSub = $('#rotateSub');
+        if (rotateSub) rotateSub.addEventListener('click', async () => {
+            if (!confirm('Сменить токен подписки? Старая ссылка перестанет работать — на каждом клиенте нужно будет обновить URL подписки.')) return;
+            try {
+                await api('sub-rotate.cgi', { method: 'POST' });
+                toast('Токен обновлён');
+                await loadVps();
+            } catch (e) { toast(e.message, true); }
+        });
     } catch (e) {
         box.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
+    }
+}
+
+/* ---------- traffic ---------- */
+let trafficTimer = null;
+function stopTrafficPolling() {
+    if (trafficTimer) { clearInterval(trafficTimer); trafficTimer = null; }
+}
+async function openTraffic() {
+    stopTrafficPolling();
+    const box = $('#trafficBox');
+    box.innerHTML = `
+        <div id="trafficStatsCard">
+            <h3 style="margin:0 0 6px">Текущая нагрузка VPS</h3>
+            <div class="trafficStatsGrid">
+                <div class="ts"><div class="tsLabel">Входящий</div><div class="tsValue" id="tsRx">—</div></div>
+                <div class="ts"><div class="tsLabel">Исходящий</div><div class="tsValue" id="tsTx">—</div></div>
+                <div class="ts"><div class="tsLabel">Скорость ↓</div><div class="tsValue" id="tsRxRate">—</div></div>
+                <div class="ts"><div class="tsLabel">Скорость ↑</div><div class="tsValue" id="tsTxRate">—</div></div>
+                <div class="ts"><div class="tsLabel">TCP-соединений</div><div class="tsValue" id="tsTcp">—</div></div>
+                <div class="ts"><div class="tsLabel">UDP-потоков</div><div class="tsValue" id="tsUdp">—</div></div>
+                <div class="ts"><div class="tsLabel">xray RAM</div><div class="tsValue" id="tsRss">—</div></div>
+                <div class="ts"><div class="tsLabel">xray uptime</div><div class="tsValue" id="tsUp">—</div></div>
+            </div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+        <div class="trafficControls">
+            <h3 style="margin:0">Куда ходят клиенты — топ адресов</h3>
+            <div class="row" style="margin-left:auto;gap:8px">
+                <label style="font-size:12px;color:var(--muted)">Период:</label>
+                <select id="trafficPeriod" class="field" style="width:120px">
+                    <option value="15">15 мин</option>
+                    <option value="60" selected>1 час</option>
+                    <option value="360">6 часов</option>
+                    <option value="1440">24 часа</option>
+                </select>
+            </div>
+        </div>
+        <div class="empty" style="margin:6px 0 12px;font-size:12px">
+            Парсится <code>/var/log/wisd/access.log</code>: куда подключались клиенты через VLESS/Hysteria2/SOCKS/HTTP.
+            Иногда вместо домена отображается IP — это значит клиент сам зарезолвил DNS, и сервер увидел только IP.
+        </div>
+        <div id="trafficDestBox"><div class="empty">Загрузка…</div></div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+        <h3 style="margin:0 0 6px">Последние подключения</h3>
+        <div class="empty" style="margin:0 0 10px;font-size:12px">
+            Поток событий из <code>access.log</code> — каждая строка одно подключение.
+        </div>
+        <div id="trafficRecentBox"><div class="empty">Загрузка…</div></div>
+    `;
+    $('#trafficPeriod').addEventListener('change', loadTrafficDestinations);
+    await refreshTrafficStats(true);
+    await Promise.all([loadTrafficDestinations(), loadTrafficRecent()]);
+    trafficTimer = setInterval(() => {
+        refreshTrafficStats(false);
+        loadTrafficDestinations();
+        loadTrafficRecent();
+    }, 5000);
+}
+
+let lastTrafficStats = null;
+async function refreshTrafficStats(initial) {
+    try {
+        const s = await api('traffic.cgi?action=stats');
+        if (!s.ok) return;
+        $('#tsRx').textContent = fmtBytes(s.rxBytes);
+        $('#tsTx').textContent = fmtBytes(s.txBytes);
+        $('#tsTcp').textContent = s.establishedTCP || 0;
+        $('#tsUdp').textContent = s.activeUDP || 0;
+        $('#tsRss').textContent = fmtBytes((s.xray && s.xray.rssBytes) || 0);
+        $('#tsUp').textContent = fmtElapsed((s.xray && s.xray.uptimeSec) || 0);
+        if (lastTrafficStats && !initial) {
+            const dt = Math.max(1, s.timestamp - lastTrafficStats.timestamp);
+            const drx = Math.max(0, s.rxBytes - lastTrafficStats.rxBytes) / dt;
+            const dtx = Math.max(0, s.txBytes - lastTrafficStats.txBytes) / dt;
+            $('#tsRxRate').textContent = fmtBytes(drx) + '/s';
+            $('#tsTxRate').textContent = fmtBytes(dtx) + '/s';
+        } else {
+            $('#tsRxRate').textContent = '—';
+            $('#tsTxRate').textContent = '—';
+        }
+        lastTrafficStats = s;
+    } catch (e) { /* silent */ }
+}
+
+async function loadTrafficDestinations() {
+    const sel = $('#trafficPeriod');
+    const minutes = sel ? sel.value : 60;
+    const box = $('#trafficDestBox');
+    if (!box) return;
+    try {
+        const r = await api('traffic.cgi?action=destinations&minutes=' + encodeURIComponent(minutes) + '&limit=40');
+        if (!r.ok || !r.rows || !r.rows.length) {
+            box.innerHTML = '<div class="empty">Пока пусто — клиенты не активны или access.log пуст за выбранный период.</div>';
+            return;
+        }
+        const rows = r.rows.map(d => `
+            <tr>
+                <td class="mono">${escapeHtml(d.host)}${d.port ? ':' + d.port : ''}</td>
+                <td><span class="pill">${escapeHtml(d.inbound || '')}</span></td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums">${d.count}</td>
+                <td style="text-align:right;color:var(--muted);font-size:12px">${escapeHtml(d.lastTs || '')}</td>
+            </tr>`).join('');
+        box.innerHTML = `
+            <table class="trafficTable">
+                <thead><tr><th>Адрес</th><th>Inbound</th><th style="text-align:right">Подключений</th><th style="text-align:right">Последний раз</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+            <div style="color:var(--muted);font-size:12px;margin-top:6px">
+                За ${r.minutes} мин: ${r.totalRecent} событий · сканировано ${r.totalLinesScanned}.
+            </div>`;
+    } catch (e) {
+        box.innerHTML = `<div class="empty">Ошибка: ${escapeHtml(e.message)}</div>`;
+    }
+}
+
+async function loadTrafficRecent() {
+    const box = $('#trafficRecentBox');
+    if (!box) return;
+    try {
+        const r = await api('traffic.cgi?action=recent&limit=40');
+        if (!r.ok || !r.items || !r.items.length) {
+            box.innerHTML = '<div class="empty">Нет данных за последние подключения.</div>';
+            return;
+        }
+        const items = r.items.slice().reverse().map(it => `
+            <div class="logLine">
+                <span style="color:var(--muted)">${escapeHtml(it.ts)}</span>
+                <span class="pill">${escapeHtml(it.inbound)}</span>
+                <span style="color:${it.verdict === 'rejected' ? 'var(--err,#f33)' : 'var(--ok,#2ea043)'}">${escapeHtml(it.verdict)}</span>
+                <span class="mono">${escapeHtml(it.dest)}</span>
+                <span style="color:var(--muted);font-size:11px;margin-left:auto">от ${escapeHtml(it.src)}</span>
+            </div>
+        `).join('');
+        box.innerHTML = `<div class="logBox">${items}</div>`;
+    } catch (e) {
+        box.innerHTML = `<div class="empty">Ошибка: ${escapeHtml(e.message)}</div>`;
     }
 }
 

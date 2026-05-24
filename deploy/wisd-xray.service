@@ -7,6 +7,9 @@ Wants=network-online.target
 Type=simple
 User=wisd
 Group=wisd
+# Make logs group-readable so www-data (in group wisd) can parse them for the
+# traffic dashboard. Files become 0640, dirs 0750.
+UMask=0027
 ExecStart=/usr/local/bin/xray run -config /var/lib/wisd/xray.json
 Restart=on-failure
 RestartSec=3s

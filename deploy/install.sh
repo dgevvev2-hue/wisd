@@ -154,9 +154,11 @@ if [[ ! -s "$XRAY_CFG" ]]; then
               serverNames:[$sni], privateKey:$priv, shortIds:[$short]}},
          sniffing:{enabled:true, destOverride:["http","tls","quic"]}},
         {tag:"socks-in", listen:"0.0.0.0", port:$sp, protocol:"socks",
-         settings:{auth:"password", accounts:[{user:$pu, pass:$pp}], udp:true}},
+         settings:{auth:"password", accounts:[{user:$pu, pass:$pp}], udp:true},
+         sniffing:{enabled:true, destOverride:["http","tls","quic"]}},
         {tag:"http-in", listen:"0.0.0.0", port:$hp, protocol:"http",
-         settings:{accounts:[{user:$pu, pass:$pp}]}}
+         settings:{accounts:[{user:$pu, pass:$pp}]},
+         sniffing:{enabled:true, destOverride:["http","tls","quic"]}}
       ],
       outbounds: [
         {tag:"direct", protocol:"freedom", settings:{}},
@@ -365,10 +367,19 @@ nft -f /etc/nftables.d/wisd-hop.conf
 systemctl enable nftables.service 2>/dev/null || true
 systemctl restart nftables.service 2>/dev/null || true
 
-step "Bootstrap admin credentials + session key"
+step "Bootstrap admin credentials + session key + subscription token"
 ADMIN_FILE=$STATE_DIR/admin.json
 SESSION_KEY=$STATE_DIR/session.key
 ADMIN_TXT=$STATE_DIR/admin.txt
+SUB_TOKEN_FILE=$STATE_DIR/sub.token
+
+# Public token for the /sub endpoint (long-lived; can be rotated from the panel).
+if [[ ! -s "$SUB_TOKEN_FILE" ]]; then
+    head -c 32 /dev/urandom | xxd -p -c 64 | tr -d '\n' > "$SUB_TOKEN_FILE"
+    printf '\n' >> "$SUB_TOKEN_FILE"
+    chown wisd:www-data "$SUB_TOKEN_FILE"
+    chmod 0640 "$SUB_TOKEN_FILE"
+fi
 
 # Random 32-byte session signing key (HMAC-SHA256).
 if [[ ! -s "$SESSION_KEY" ]]; then
@@ -448,6 +459,16 @@ location = /cgi-bin/logout.cgi {
     fastcgi_param SCRIPT_FILENAME /var/www/wisd$fastcgi_script_name;
     fastcgi_param DOCUMENT_ROOT /var/www/wisd;
     fastcgi_read_timeout 10s;
+}
+# Public subscription endpoint (token-protected, no cookie auth).
+location = /sub {
+    gzip off;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass unix:/run/fcgiwrap.socket;
+    fastcgi_param SCRIPT_FILENAME /var/www/wisd/cgi-bin/sub.cgi;
+    fastcgi_param SCRIPT_NAME /cgi-bin/sub.cgi;
+    fastcgi_param DOCUMENT_ROOT /var/www/wisd;
+    fastcgi_read_timeout 30s;
 }
 # Internal subrequest endpoint for auth_request.
 location = /__auth {

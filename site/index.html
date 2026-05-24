@@ -497,6 +497,72 @@ textarea.field { height: auto; padding: 12px 14px; font-family: ui-monospace, mo
 
 /* misc */
 .empty { padding: 22px; color: var(--muted); text-align: center; font-size: 13px; }
+
+/* ---------- traffic tab ---------- */
+.trafficStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+.trafficStatsGrid .ts {
+    background: rgba(0,0,0,0.20);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    transition: 0.18s transform, 0.18s border-color;
+}
+.trafficStatsGrid .ts:hover { transform: translateY(-1px); border-color: var(--accent); }
+.trafficStatsGrid .tsLabel { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+.trafficStatsGrid .tsValue { font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; }
+.trafficControls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.trafficTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 6px;
+}
+.trafficTable thead th {
+    text-align: left;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--line);
+    padding: 8px 8px;
+}
+.trafficTable tbody td {
+    padding: 8px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.trafficTable tbody tr {
+    transition: 0.18s background;
+}
+.trafficTable tbody tr:hover {
+    background: rgba(0,0,0,0.25);
+}
+.logBox {
+    background: rgba(0,0,0,0.20);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 6px 8px;
+    max-height: 320px;
+    overflow-y: auto;
+    font-family: ui-monospace, monospace;
+}
+.logLine {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 11.5px;
+    line-height: 1.4;
+    flex-wrap: wrap;
+}
+.logLine:last-child { border-bottom: none; }
+.logLine .pill { font-size: 10px; padding: 2px 8px; }
 </style>
 </head>
 <body>
@@ -559,6 +625,7 @@ textarea.field { height: auto; padding: 12px 14px; font-family: ui-monospace, mo
             <button class="tab" data-page="subsPage">Подписки</button>
             <button class="tab" data-page="rulesPage">Маршруты</button>
             <button class="tab" data-page="vpsPage">Этот VPS</button>
+            <button class="tab" data-page="trafficPage">Трафик</button>
             <button class="tab" data-page="systemPage">Система</button>
         </div>
 
@@ -618,6 +685,13 @@ textarea.field { height: auto; padding: 12px 14px; font-family: ui-monospace, mo
             <!-- THIS VPS -->
             <section id="vpsPage" class="page">
                 <div id="vpsBox" class="serverInfo">
+                    <div class="empty">Загрузка…</div>
+                </div>
+            </section>
+
+            <!-- TRAFFIC -->
+            <section id="trafficPage" class="page">
+                <div id="trafficBox" class="serverInfo">
                     <div class="empty">Загрузка…</div>
                 </div>
             </section>
