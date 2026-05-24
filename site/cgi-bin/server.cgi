@@ -23,6 +23,11 @@ proxy_user=$(jq -r '.proxyUser // ""' "$WISD_SERVER_FILE")
 proxy_pass=$(jq -r '.proxyPass // ""' "$WISD_SERVER_FILE")
 socks_port=$(jq -r '.socksPort // 1080' "$WISD_SERVER_FILE")
 http_port=$(jq -r '.httpPort // 1081' "$WISD_SERVER_FILE")
+hy2_pass=$(jq -r '.hy2Pass // ""' "$WISD_SERVER_FILE")
+hy2_sni=$(jq -r '.hy2Sni // ""' "$WISD_SERVER_FILE")
+hy2_port=$(jq -r '.hy2Port // 443' "$WISD_SERVER_FILE")
+hy2_port_low=$(jq -r '.hy2PortLow // 0' "$WISD_SERVER_FILE")
+hy2_port_high=$(jq -r '.hy2PortHigh // 0' "$WISD_SERVER_FILE")
 
 if [[ -z "$host" || "$host" == "null" ]]; then
     host=$(curl -s --max-time 2 https://ifconfig.io 2>/dev/null)
@@ -48,6 +53,16 @@ pp_enc=$(url_encode "$proxy_pass")
 socks_url="socks5://${pu_enc}:${pp_enc}@${host}:${socks_port}"
 http_url="http://${pu_enc}:${pp_enc}@${host}:${http_port}"
 
+hy2_url=""
+if [[ -n "$hy2_pass" && -n "$hy2_sni" ]]; then
+    hy2_pass_enc=$(url_encode "$hy2_pass")
+    if [[ "$hy2_port_low" -gt 0 && "$hy2_port_high" -gt 0 ]]; then
+        hy2_url="hysteria2://${hy2_pass_enc}@${host}:${hy2_port}?insecure=1&sni=${hy2_sni}&mport=${hy2_port_low}-${hy2_port_high}#wisd-hy2-${host}"
+    else
+        hy2_url="hysteria2://${hy2_pass_enc}@${host}:${hy2_port}?insecure=1&sni=${hy2_sni}#wisd-hy2-${host}"
+    fi
+fi
+
 cat <<JSON
 {
   "ok": true,
@@ -66,6 +81,14 @@ cat <<JSON
     "pass": "$(json_escape "$proxy_pass")",
     "socksUrl": "$(json_escape "$socks_url")",
     "httpUrl": "$(json_escape "$http_url")"
+  },
+  "hysteria2": {
+    "port": $hy2_port,
+    "portLow": $hy2_port_low,
+    "portHigh": $hy2_port_high,
+    "sni": "$(json_escape "$hy2_sni")",
+    "pass": "$(json_escape "$hy2_pass")",
+    "url": "$(json_escape "$hy2_url")"
   }
 }
 JSON

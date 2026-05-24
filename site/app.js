@@ -361,8 +361,26 @@ async function loadVps() {
             return;
         }
         const p = r.proxy || {};
+        const h = r.hysteria2 || {};
+        const hy2Section = h.url ? `
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+            <h3 style="margin:0 0 6px">Hysteria2 (UDP — против глушилок и DPI)</h3>
+            <div class="empty" style="margin:0 0 10px;font-size:12px">
+                UDP-транспорт через QUIC. Работает даже когда TSPU душит VLESS на TCP.
+                Порт-хоппинг (UDP ${h.portLow || h.port}-${h.portHigh || h.port}) — клиент прыгает по портам, не привязан к одному.
+            </div>
+            <div class="row"><span>Адрес</span><b class="mono">${escapeHtml(r.host)}:${h.port}</b></div>
+            <div class="row"><span>SNI</span><b>${escapeHtml(h.sni || '')}</b></div>
+            <div class="row"><span>Port range</span><b class="mono">${h.portLow || '—'}-${h.portHigh || '—'}/UDP</b></div>
+            <div class="row"><span>Пароль</span><b class="mono">${escapeHtml(h.pass || '')}</b></div>
+            <div class="url" id="hy2Url">${escapeHtml(h.url)}</div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+                <button id="copyHy2" class="btn">Копировать Hysteria2</button>
+            </div>
+        ` : '';
         box.innerHTML = `
-            <h3 style="margin:0 0 10px">VLESS-Reality (туннель)</h3>
+            <h3 style="margin:0 0 10px">VLESS-Reality (TCP — основной туннель)</h3>
             <div class="row"><span>Адрес</span><b>${escapeHtml(r.host)}:${r.port}</b></div>
             <div class="row"><span>Протокол</span><b>VLESS · Reality</b></div>
             <div class="row"><span>UUID</span><b class="mono">${escapeHtml(r.uuid)}</b></div>
@@ -374,6 +392,8 @@ async function loadVps() {
             <div class="row" style="justify-content:flex-end;gap:8px">
                 <button id="copyUrl" class="btn">Копировать VLESS</button>
             </div>
+
+            ${hy2Section}
 
             <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
 
@@ -400,6 +420,8 @@ async function loadVps() {
         $('#copyHttp').addEventListener('click', () => copy(p.httpUrl || ''));
         $('#copyUser').addEventListener('click', () => copy(p.user || ''));
         $('#copyPass').addEventListener('click', () => copy(p.pass || ''));
+        const copyHy2 = $('#copyHy2');
+        if (copyHy2) copyHy2.addEventListener('click', () => copy(h.url || ''));
     } catch (e) {
         box.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
     }

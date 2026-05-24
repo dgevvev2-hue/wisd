@@ -34,7 +34,8 @@ step "Install OS packages"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y --no-install-recommends \
-    nginx fcgiwrap jq curl ca-certificates unzip uuid-runtime python3 xxd sudo
+    nginx fcgiwrap jq curl ca-certificates unzip uuid-runtime python3 xxd sudo \
+    openssl nftables
 # Make sure /etc/sudoers.d exists (minimal Debian images may omit it).
 mkdir -p /etc/sudoers.d
 chmod 0750 /etc/sudoers.d
@@ -178,6 +179,106 @@ systemctl daemon-reload
 systemctl enable wisd-xray.service
 systemctl restart wisd-xray.service
 
+step "Enable BBR + tuned sysctl (VPN stability)"
+install -m 0644 "$REPO_DIR/deploy/wisd-sysctl.conf" /etc/sysctl.d/99-wisd-net.conf
+sysctl -p /etc/sysctl.d/99-wisd-net.conf | tail -3 || true
+
+step "Install sing-box (Hysteria2 UDP transport)"
+SB_VERSION=${SB_VERSION:-1.10.7}
+if [[ ! -x /usr/local/bin/sing-box ]] || ! /usr/local/bin/sing-box version 2>/dev/null | grep -q "$SB_VERSION"; then
+    tmp=$(mktemp -d)
+    sb_arch=$(uname -m)
+    case "$sb_arch" in
+        x86_64|amd64) sb_zip="sing-box-${SB_VERSION}-linux-amd64.tar.gz"; sb_dir="sing-box-${SB_VERSION}-linux-amd64" ;;
+        aarch64|arm64) sb_zip="sing-box-${SB_VERSION}-linux-arm64.tar.gz"; sb_dir="sing-box-${SB_VERSION}-linux-arm64" ;;
+        *) echo "Unsupported arch for sing-box: $sb_arch"; exit 1 ;;
+    esac
+    curl -fsSL -o "$tmp/sb.tar.gz" "https://github.com/SagerNet/sing-box/releases/download/v${SB_VERSION}/${sb_zip}"
+    tar -xzf "$tmp/sb.tar.gz" -C "$tmp"
+    install -m 0755 "$tmp/$sb_dir/sing-box" /usr/local/bin/sing-box
+    rm -rf "$tmp"
+fi
+
+step "Generate Hysteria2 secrets + self-signed cert"
+HY2_DIR=/etc/wisd-hy2
+mkdir -p "$HY2_DIR"
+if ! jq -e '.hy2Pass' "$SERVER_FILE" >/dev/null 2>&1; then
+    hy2_pass=$(head -c 24 /dev/urandom | base64 | tr -d '+/=' | head -c 32)
+    hy2_sni=${WISD_HY2_SNI:-www.bing.com}
+    tmp=$(mktemp)
+    jq --arg pw "$hy2_pass" --arg sni "$hy2_sni" --argjson port 443 \
+       --argjson plo 30000 --argjson phi 50000 \
+       '. + {hy2Pass:$pw, hy2Sni:$sni, hy2Port:$port, hy2PortLow:$plo, hy2PortHigh:$phi}' \
+       "$SERVER_FILE" > "$tmp" && mv "$tmp" "$SERVER_FILE"
+    chown wisd:wisd "$SERVER_FILE"
+    chmod 0640 "$SERVER_FILE"
+fi
+HY2_PASS=$(jq -r '.hy2Pass' "$SERVER_FILE")
+HY2_SNI=$(jq -r '.hy2Sni' "$SERVER_FILE")
+HY2_PORT=$(jq -r '.hy2Port' "$SERVER_FILE")
+if [[ ! -f "$HY2_DIR/cert.crt" ]]; then
+    openssl ecparam -genkey -name prime256v1 -out "$HY2_DIR/private.key"
+    openssl req -new -x509 -days 3650 -key "$HY2_DIR/private.key" \
+        -out "$HY2_DIR/cert.crt" -subj "/CN=$HY2_SNI" 2>/dev/null
+    chown root:root "$HY2_DIR/cert.crt" "$HY2_DIR/private.key"
+    chmod 0644 "$HY2_DIR/cert.crt"
+    chmod 0600 "$HY2_DIR/private.key"
+fi
+
+step "Write sing-box (Hysteria2) config"
+jq -n --arg pass "$HY2_PASS" --arg sni "$HY2_SNI" --argjson port "$HY2_PORT" '
+{
+  log: { level: "warn", timestamp: true },
+  inbounds: [{
+    type: "hysteria2",
+    tag: "hy2-in",
+    listen: "::",
+    listen_port: $port,
+    up_mbps: 1000,
+    down_mbps: 1000,
+    users: [{ name: "wisd", password: $pass }],
+    masquerade: ("https://" + $sni),
+    tls: {
+      enabled: true,
+      server_name: $sni,
+      alpn: ["h3"],
+      certificate_path: "/etc/wisd-hy2/cert.crt",
+      key_path: "/etc/wisd-hy2/private.key"
+    }
+  }],
+  outbounds: [
+    { type: "direct", tag: "direct" },
+    { type: "block", tag: "block" }
+  ]
+}' > "$HY2_DIR/sing-box.json"
+chmod 0644 "$HY2_DIR/sing-box.json"
+
+step "Install Hysteria2 systemd unit"
+install -m 0644 "$REPO_DIR/deploy/wisd-hy2.service" /etc/systemd/system/wisd-hy2.service
+systemctl daemon-reload
+systemctl enable wisd-hy2.service
+systemctl restart wisd-hy2.service
+
+step "Set up Hysteria2 port-hopping (UDP $(jq -r '.hy2PortLow' "$SERVER_FILE")-$(jq -r '.hy2PortHigh' "$SERVER_FILE") -> :$HY2_PORT)"
+HY2_LO=$(jq -r '.hy2PortLow' "$SERVER_FILE")
+HY2_HI=$(jq -r '.hy2PortHigh' "$SERVER_FILE")
+mkdir -p /etc/nftables.d
+cat > /etc/nftables.d/wisd-hop.conf <<NFT
+table inet wisd_hop {
+    chain prerouting {
+        type nat hook prerouting priority dstnat; policy accept;
+        udp dport ${HY2_LO}-${HY2_HI} redirect to :${HY2_PORT}
+    }
+}
+NFT
+if ! grep -q 'include "/etc/nftables.d/' /etc/nftables.conf 2>/dev/null; then
+    echo 'include "/etc/nftables.d/*.conf"' >> /etc/nftables.conf
+fi
+nft delete table inet wisd_hop 2>/dev/null || true
+nft -f /etc/nftables.d/wisd-hop.conf
+systemctl enable nftables.service 2>/dev/null || true
+systemctl restart nftables.service 2>/dev/null || true
+
 step "Install nginx site"
 install -m 0644 "$REPO_DIR/deploy/wisd.nginx.conf" /etc/nginx/sites-available/wisd
 ln -sf /etc/nginx/sites-available/wisd /etc/nginx/sites-enabled/wisd
@@ -203,27 +304,40 @@ if command -v ufw >/dev/null 2>&1; then
     ufw status | grep -q "Status: active" && {
         s_sp=$(jq -r '.socksPort // 1080' "$SERVER_FILE")
         s_hp=$(jq -r '.httpPort // 1081' "$SERVER_FILE")
+        hy2_port=$(jq -r '.hy2Port // 443' "$SERVER_FILE")
+        hy2_lo=$(jq -r '.hy2PortLow // 30000' "$SERVER_FILE")
+        hy2_hi=$(jq -r '.hy2PortHigh // 50000' "$SERVER_FILE")
         ufw allow 80/tcp >/dev/null
         ufw allow 443/tcp >/dev/null
         ufw allow "$s_sp/tcp" >/dev/null
         ufw allow "$s_hp/tcp" >/dev/null
+        ufw allow "$hy2_port/udp" >/dev/null
+        ufw allow "${hy2_lo}:${hy2_hi}/udp" >/dev/null
         ufw reload >/dev/null
     }
 fi
 
-step "Save client VLESS URL"
+step "Save client URLs"
 pubip=$(jq -r '.host' "$SERVER_FILE")
 uuid=$(jq -r '.uuid' "$SERVER_FILE")
 pub=$(jq -r '.publicKey' "$SERVER_FILE")
 sid=$(jq -r '.shortId' "$SERVER_FILE")
 sni=$(jq -r '.serverName' "$SERVER_FILE")
 flow=$(jq -r '.flow' "$SERVER_FILE")
+hy2_pass=$(jq -r '.hy2Pass' "$SERVER_FILE")
+hy2_sni=$(jq -r '.hy2Sni' "$SERVER_FILE")
+hy2_port=$(jq -r '.hy2Port' "$SERVER_FILE")
+hy2_lo=$(jq -r '.hy2PortLow' "$SERVER_FILE")
+hy2_hi=$(jq -r '.hy2PortHigh' "$SERVER_FILE")
 echo "vless://${uuid}@${pubip}:443?encryption=none&security=reality&sni=${sni}&fp=chrome&pbk=${pub}&sid=${sid}&type=tcp&flow=${flow}#wisd-${pubip}" \
     > "$STATE_DIR/client_url.txt"
-chown wisd:wisd "$STATE_DIR/client_url.txt"
+echo "hysteria2://${hy2_pass}@${pubip}:${hy2_port}?insecure=1&sni=${hy2_sni}&mport=${hy2_lo}-${hy2_hi}#wisd-hy2-${pubip}" \
+    > "$STATE_DIR/hy2_url.txt"
+chown wisd:wisd "$STATE_DIR/client_url.txt" "$STATE_DIR/hy2_url.txt"
 
 step "Done"
-echo "Panel:      http://$pubip/"
-echo "VLESS URL:  $(cat "$STATE_DIR/client_url.txt")"
-echo "State dir:  $STATE_DIR"
+echo "Panel:        http://$pubip/"
+echo "VLESS URL:    $(cat "$STATE_DIR/client_url.txt")"
+echo "Hysteria2 URL: $(cat "$STATE_DIR/hy2_url.txt")"
+echo "State dir:    $STATE_DIR"
 echo "Logs:       $LOG_DIR"
