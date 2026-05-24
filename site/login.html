@@ -112,10 +112,20 @@ button { cursor: pointer; background: none; border: 0; padding: 0; }
     -webkit-backdrop-filter: blur(28px);
     opacity: 0;
     transform: translateY(14px) scale(0.985);
-    animation: appear 0.6s cubic-bezier(.16,.84,.44,1) 0.05s forwards;
+    transition: opacity 0.55s cubic-bezier(.16,.84,.44,1), transform 0.55s cubic-bezier(.16,.84,.44,1);
 }
-@keyframes appear {
-    to { opacity: 1; transform: translateY(0) scale(1); }
+body.ready .card {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+.card-shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes shake {
+    10%, 90%  { transform: translateX(-3px); }
+    20%, 80%  { transform: translateX(5px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60%  { transform: translateX(8px); }
 }
 
 .brand {
@@ -264,13 +274,7 @@ label {
     border-width: 1px;
 }
 
-.card.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97); }
-@keyframes shake {
-    10%, 90%  { transform: translateX(-3px); }
-    20%, 80%  { transform: translateX(5px); }
-    30%, 50%, 70% { transform: translateX(-8px); }
-    40%, 60%  { transform: translateX(8px); }
-}
+
 
 .footer {
     margin-top: 22px;
@@ -340,7 +344,9 @@ const submitBtn = $('#submitBtn');
 const errorEl = $('#error');
 const card = $('.card');
 
-userIn.focus();
+// Trigger entrance transition after first paint.
+requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('ready')));
+setTimeout(() => userIn.focus(), 250);
 
 eyeBtn.addEventListener('click', () => {
     const showing = passIn.type === 'text';
@@ -353,9 +359,11 @@ eyeBtn.addEventListener('click', () => {
 function showError(msg) {
     errorEl.textContent = msg;
     errorEl.classList.add('show');
-    card.classList.remove('shake');
+    // Re-trigger shake by toggling the class via a forced reflow.
+    card.classList.remove('card-shake');
     void card.offsetWidth;
-    card.classList.add('shake');
+    card.classList.add('card-shake');
+    setTimeout(() => card.classList.remove('card-shake'), 600);
 }
 function hideError() {
     errorEl.classList.remove('show');
