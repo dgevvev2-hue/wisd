@@ -92,7 +92,7 @@ if [[ ! -s "$SERVER_FILE" ]]; then
           --arg sid "$short_id" \
           --arg sni "$server_name" \
           --arg host "$pubip" \
-          --argjson port 443 \
+          --argjson port "${WISD_VLESS_PORT:-2053}" \
           --arg flow "xtls-rprx-vision" \
           --arg pu "$proxy_user" \
           --arg pp "$proxy_pass" \
@@ -131,7 +131,9 @@ if [[ ! -s "$XRAY_CFG" ]]; then
     s_pp=$(jq -r '.proxyPass' "$SERVER_FILE")
     s_sp=$(jq -r '.socksPort // 1080' "$SERVER_FILE")
     s_hp=$(jq -r '.httpPort // 1081' "$SERVER_FILE")
-    jq -n --arg log "$LOG_DIR/xray.log" \
+    s_vport=$(jq -r '.port // 2053' "$SERVER_FILE")
+    jq -n --argjson vport "$s_vport" \
+          --arg log "$LOG_DIR/xray.log" \
           --arg access "$LOG_DIR/access.log" \
           --arg uuid "$s_uuid" \
           --arg priv "$s_priv" \
@@ -145,7 +147,7 @@ if [[ ! -s "$XRAY_CFG" ]]; then
     {
       log: {loglevel:"warning", error:$log, access:$access},
       inbounds: [
-        {tag:"vless-in", listen:"0.0.0.0", port:443, protocol:"vless",
+        {tag:"vless-in", listen:"0.0.0.0", port:$vport, protocol:"vless",
          settings:{clients:[{id:$uuid, flow:$flow}], decryption:"none"},
          streamSettings:{network:"tcp", security:"reality",
             realitySettings:{show:false, dest:($sni+":443"), xver:0,
@@ -488,17 +490,22 @@ NGINX
 }
 
 WISD_DOMAIN=${WISD_DOMAIN:-}
-TLS_PORT=${WISD_TLS_PORT:-4443}
+TLS_PORT=${WISD_TLS_PORT:-443}
+if [[ "$TLS_PORT" == "443" ]]; then
+    TLS_HOST_SUFFIX=""
+else
+    TLS_HOST_SUFFIX=":${TLS_PORT}"
+fi
 CERT_DIR=""
 if [[ -n "$WISD_DOMAIN" ]]; then
     CERT_DIR="/etc/letsencrypt/live/$WISD_DOMAIN"
 fi
 
 if [[ -n "$WISD_DOMAIN" && -s "$CERT_DIR/fullchain.pem" ]]; then
-    # TLS is set up — :80 redirects to HTTPS, panel served from :4443.
+    # TLS is set up — :80 redirects to HTTPS, panel served from :${TLS_PORT}.
     cat > /etc/nginx/wisd-http-mode.conf <<NGINX
 location / {
-    return 301 https://\$host:${TLS_PORT}\$request_uri;
+    return 301 https://\$host${TLS_HOST_SUFFIX}\$request_uri;
 }
 NGINX
     # HTTPS server with auth-protected panel.
@@ -558,7 +565,7 @@ if [[ -n "$WISD_DOMAIN" && ! -s "$CERT_DIR/fullchain.pem" ]]; then
         # Switch HTTP mode to redirect, install HTTPS server block, reload.
         cat > /etc/nginx/wisd-http-mode.conf <<NGINX
 location / {
-    return 301 https://\$host:${TLS_PORT}\$request_uri;
+    return 301 https://\$host${TLS_HOST_SUFFIX}\$request_uri;
 }
 NGINX
         write_panel_locations /tmp/wisd-https-locations.conf
@@ -592,7 +599,11 @@ NGINX
         } > /etc/nginx/wisd-https.server
         rm -f /tmp/wisd-https-locations.conf
         nginx -t && systemctl reload nginx
-        echo "TLS configured: https://$WISD_DOMAIN:${TLS_PORT}/"
+        if [[ "$TLS_PORT" == "443" ]]; then
+            echo "TLS configured: https://$WISD_DOMAIN/"
+        else
+            echo "TLS configured: https://$WISD_DOMAIN:${TLS_PORT}/"
+        fi
     else
         echo "!! certbot failed for $WISD_DOMAIN — staying on HTTP for now."
         echo "!! Check that the A record for $WISD_DOMAIN points at this VPS and re-run with WISD_DOMAIN=$WISD_DOMAIN."
@@ -620,7 +631,8 @@ if command -v ufw >/dev/null 2>&1; then
         hy2_hi=$(jq -r '.hy2PortHigh // 50000' "$SERVER_FILE")
         ufw allow 80/tcp >/dev/null
         ufw allow 443/tcp >/dev/null
-        ufw allow "${WISD_TLS_PORT:-4443}/tcp" >/dev/null
+        ufw allow "${WISD_TLS_PORT:-443}/tcp" >/dev/null
+        ufw allow "${WISD_VLESS_PORT:-2053}/tcp" >/dev/null
         ufw allow "$s_sp/tcp" >/dev/null
         ufw allow "$s_hp/tcp" >/dev/null
         ufw allow "$hy2_port/udp" >/dev/null
@@ -649,7 +661,12 @@ chown wisd:wisd "$STATE_DIR/client_url.txt" "$STATE_DIR/hy2_url.txt"
 
 step "Done"
 if [[ -n "${WISD_DOMAIN:-}" && -s "/etc/letsencrypt/live/$WISD_DOMAIN/fullchain.pem" ]]; then
-    echo "Panel:        https://$WISD_DOMAIN:${TLS_PORT:-4443}/"
+    panel_port=${TLS_PORT:-443}
+    if [[ "$panel_port" == "443" ]]; then
+        echo "Panel:        https://$WISD_DOMAIN/"
+    else
+        echo "Panel:        https://$WISD_DOMAIN:${panel_port}/"
+    fi
 else
     echo "Panel:        http://$pubip/"
 fi
