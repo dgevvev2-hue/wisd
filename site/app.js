@@ -16,7 +16,14 @@ const $ = (sel, root=document) => root.querySelector(sel);
 const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
 function api(path, opts={}) {
+    if (!opts.credentials) opts.credentials = 'same-origin';
     return fetch(`${API_BASE}/cgi-bin/${path}`, opts).then(async r => {
+        if (r.status === 401) {
+            const err = new Error('auth required');
+            err.code = 401;
+            handleAuthError(err);
+            throw err;
+        }
         const ct = r.headers.get('content-type') || '';
         const body = ct.includes('application/json') ? await r.json() : await r.text();
         if (!r.ok) throw new Error((body && body.message) || `HTTP ${r.status}`);
@@ -28,9 +35,18 @@ function toast(msg, isErr=false, ms=2400) {
     const t = $('#toast');
     t.textContent = msg;
     t.classList.toggle('err', !!isErr);
+    t.classList.toggle('ok', !isErr);
     t.classList.add('show');
     clearTimeout(toast._h);
     toast._h = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+function handleAuthError(e) {
+    if (e && (e.code === 401 || /401/.test(e.message || ''))) {
+        location.href = '/login.html?next=' + encodeURIComponent(location.pathname + location.search);
+        return true;
+    }
+    return false;
 }
 
 function fmtElapsed(s) {
@@ -95,6 +111,17 @@ $('#themeBtn').addEventListener('click', () => {
 
 /* ---------- reload ---------- */
 $('#reloadBtn').addEventListener('click', () => refreshAll());
+
+/* ---------- logout ---------- */
+const logoutBtn = $('#logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            await fetch('/cgi-bin/logout.cgi', { method: 'POST', credentials: 'same-origin' });
+        } catch (_) { /* ignore */ }
+        location.href = '/login.html';
+    });
+}
 
 /* ---------- VPN status ---------- */
 async function refreshStatus() {
@@ -484,28 +511,42 @@ async function loadVps() {
                 Используй для отдельных приложений (браузер, qBittorrent, curl, Python requests и т.д.).
             </div>
         `;
-        const copy = (txt) => navigator.clipboard.writeText(txt).then(() => toast('Скопировано'));
-        $('#copyUrl').addEventListener('click', () => copy(r.url));
-        $('#copySocks').addEventListener('click', () => copy(p.socksUrl || ''));
-        $('#copyHttp').addEventListener('click', () => copy(p.httpUrl || ''));
-        $('#copyUser').addEventListener('click', () => copy(p.user || ''));
-        $('#copyPass').addEventListener('click', () => copy(p.pass || ''));
+        const copy = (txt, evt) => {
+            const btn = evt && evt.currentTarget;
+            const write = navigator.clipboard
+                ? navigator.clipboard.writeText(txt)
+                : Promise.reject(new Error('clipboard unavailable'));
+            return write.then(() => {
+                toast('Скопировано', false);
+                if (btn) {
+                    btn.classList.remove('copied');
+                    void btn.offsetWidth;
+                    btn.classList.add('copied');
+                    setTimeout(() => btn.classList.remove('copied'), 1400);
+                }
+            }).catch((e) => toast('Не удалось скопировать: ' + e.message, true));
+        };
+        $('#copyUrl').addEventListener('click', (e) => copy(r.url, e));
+        $('#copySocks').addEventListener('click', (e) => copy(p.socksUrl || '', e));
+        $('#copyHttp').addEventListener('click', (e) => copy(p.httpUrl || '', e));
+        $('#copyUser').addEventListener('click', (e) => copy(p.user || '', e));
+        $('#copyPass').addEventListener('click', (e) => copy(p.pass || '', e));
         const copyHy2 = $('#copyHy2');
-        if (copyHy2) copyHy2.addEventListener('click', () => copy(h.url || ''));
+        if (copyHy2) copyHy2.addEventListener('click', (e) => copy(h.url || '', e));
         const copyTuic = $('#copyTuic');
-        if (copyTuic) copyTuic.addEventListener('click', () => copy(t.url || ''));
+        if (copyTuic) copyTuic.addEventListener('click', (e) => copy(t.url || '', e));
         const copyStls = $('#copyStls');
-        if (copyStls) copyStls.addEventListener('click', () => {
+        if (copyStls) copyStls.addEventListener('click', (e) => {
             const cfg = JSON.stringify({
                 shadowtls: { host: r.host, port: s.port, version: 3, password: s.stlsPass },
                 shadowsocks: { server: '127.0.0.1', port: 8388, method: s.ssMethod, password: s.ssPass }
             }, null, 2);
-            copy(cfg);
+            copy(cfg, e);
         });
         const copyWsDirect = $('#copyWsDirect');
-        if (copyWsDirect) copyWsDirect.addEventListener('click', () => copy(w.directUrl || ''));
+        if (copyWsDirect) copyWsDirect.addEventListener('click', (e) => copy(w.directUrl || '', e));
         const copyWsCf = $('#copyWsCf');
-        if (copyWsCf) copyWsCf.addEventListener('click', () => copy(w.cfUrl || ''));
+        if (copyWsCf) copyWsCf.addEventListener('click', (e) => copy(w.cfUrl || '', e));
     } catch (e) {
         box.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
     }

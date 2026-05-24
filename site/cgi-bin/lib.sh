@@ -138,3 +138,21 @@ slugify() {
 regen_xray() {
     $WISD_SUDO "$WISD_CONF_DIR/regen.sh" "$@"
 }
+
+# require_auth  -- exit 401 unless the request carries a valid wisd_sess cookie.
+# This is a defence-in-depth check; nginx is the primary gate via auth_request.
+require_auth() {
+    # Skip auth check entirely when explicitly disabled (used by install/dev).
+    if [[ "${WISD_AUTH:-on}" == "off" ]]; then
+        return 0
+    fi
+    local script_dir
+    script_dir=$(dirname "${BASH_SOURCE[1]:-${BASH_SOURCE[0]}}")
+    if python3 "$script_dir/wisd_auth.py" check_cookie "${HTTP_COOKIE-}" >/dev/null 2>&1; then
+        return 0
+    fi
+    printf 'Status: 401 Unauthorized\r\n'
+    json_header
+    printf '{"ok":false,"code":401,"message":"auth required"}\n'
+    exit 0
+}

@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>wisd — вход</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<style>
+:root {
+    --bg: #0a0d12;
+    --bg-elev: #11151c;
+    --panel: rgba(20,24,32,0.78);
+    --panel-2: rgba(28,33,44,0.92);
+    --line: rgba(220,235,255,0.10);
+    --line-strong: rgba(220,235,255,0.20);
+    --text: #f4f7fb;
+    --muted: #9aa6b7;
+    --muted-2: #6c7689;
+    --accent: #6ee7b7;
+    --accent-2: #38d5ff;
+    --warn: #fbbf24;
+    --bad: #fb7185;
+    --shadow: 0 36px 96px rgba(0,0,0,0.55);
+    --radius: 22px;
+    --radius-sm: 14px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; background: none; border: 0; padding: 0; }
+
+/* ---------- animated background ---------- */
+.bg {
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.bg .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+    will-change: transform;
+}
+.bg .b1 {
+    width: 520px; height: 520px;
+    left: -120px; top: -160px;
+    background: radial-gradient(circle, rgba(110,231,183,0.50), transparent 70%);
+    animation: float1 22s ease-in-out infinite alternate;
+}
+.bg .b2 {
+    width: 480px; height: 480px;
+    right: -100px; top: 60px;
+    background: radial-gradient(circle, rgba(56,213,255,0.45), transparent 70%);
+    animation: float2 26s ease-in-out infinite alternate;
+}
+.bg .b3 {
+    width: 560px; height: 560px;
+    left: 30%; bottom: -200px;
+    background: radial-gradient(circle, rgba(155,113,255,0.32), transparent 70%);
+    animation: float3 30s ease-in-out infinite alternate;
+}
+@keyframes float1 {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(120px,80px) scale(1.1); }
+}
+@keyframes float2 {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(-90px,140px) scale(1.15); }
+}
+@keyframes float3 {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(-160px,-120px) scale(1.08); }
+}
+
+.bg .grid {
+    position: absolute; inset: 0;
+    background:
+        linear-gradient(rgba(220,235,255,0.025) 1px, transparent 1px) 0 0 / 38px 38px,
+        linear-gradient(90deg, rgba(220,235,255,0.025) 1px, transparent 1px) 0 0 / 38px 38px;
+    mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
+}
+
+/* ---------- card ---------- */
+.wrap {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+.card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: var(--radius);
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+    padding: 32px 28px 26px;
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+    animation: appear 0.6s cubic-bezier(.16,.84,.44,1) 0.05s forwards;
+}
+@keyframes appear {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.brand {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 22px;
+}
+.brand .mark {
+    width: 42px; height: 42px;
+    border-radius: 13px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.10), 0 14px 32px rgba(110,231,183,0.30);
+    position: relative;
+    overflow: hidden;
+}
+.brand .mark::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 35%, rgba(255,255,255,0.35) 50%, transparent 65%);
+    transform: translateX(-100%);
+    animation: shimmer 2.6s ease-in-out infinite;
+}
+@keyframes shimmer {
+    0%, 30% { transform: translateX(-100%); }
+    70%, 100% { transform: translateX(100%); }
+}
+.brand b { font-size: 19px; letter-spacing: -0.01em; }
+.brand .sub { font-size: 12px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+h1 {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    margin: 0 0 4px;
+}
+.hint {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 22px;
+    line-height: 1.45;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0 0 6px;
+}
+.field-wrap {
+    position: relative;
+    margin-bottom: 16px;
+}
+.field {
+    width: 100%;
+    height: 46px;
+    padding: 0 44px 0 14px;
+    border-radius: 12px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg-elev);
+    color: var(--text);
+    outline: 0;
+    font-size: 15px;
+    transition: 0.18s border-color, 0.18s box-shadow;
+}
+.field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(110,231,183,0.12);
+}
+.field::placeholder { color: var(--muted-2); }
+
+.eye {
+    position: absolute;
+    right: 8px; top: 6px;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    border-radius: 9px;
+    color: var(--muted);
+    transition: 0.16s background, 0.16s color;
+}
+.eye:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.eye svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+.btn {
+    width: 100%;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #06120d;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    margin-top: 6px;
+    position: relative;
+    overflow: hidden;
+    transition: 0.16s transform, 0.16s box-shadow, 0.16s filter;
+    box-shadow: 0 12px 32px rgba(110,231,183,0.24);
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 16px 40px rgba(110,231,183,0.32); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { filter: grayscale(0.6) brightness(0.8); cursor: wait; box-shadow: none; }
+
+.btn .spinner {
+    position: absolute;
+    inset: 0;
+    display: grid; place-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.18s opacity;
+}
+.btn.loading .spinner { opacity: 1; }
+.btn.loading .label { opacity: 0; }
+.spinner-ring {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2.5px solid rgba(6,18,13,0.25);
+    border-top-color: #06120d;
+    animation: spin 0.75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error {
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-radius: 11px;
+    background: rgba(251,113,133,0.12);
+    border: 1px solid rgba(251,113,133,0.30);
+    color: #ffd2d9;
+    font-size: 13.5px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-4px);
+    max-height: 0;
+    overflow: hidden;
+    transition: 0.22s opacity, 0.22s transform, 0.22s max-height, 0.22s margin-top, 0.22s padding;
+    padding-top: 0; padding-bottom: 0; margin-top: 0;
+    border-width: 0;
+}
+.error.show {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 80px;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border-width: 1px;
+}
+
+.card.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97); }
+@keyframes shake {
+    10%, 90%  { transform: translateX(-3px); }
+    20%, 80%  { transform: translateX(5px); }
+    30%, 50%, 70% { transform: translateX(-8px); }
+    40%, 60%  { transform: translateX(8px); }
+}
+
+.footer {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--muted-2);
+    letter-spacing: 0.04em;
+}
+.footer .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); margin-right: 6px; vertical-align: 1px; }
+</style>
+</head>
+<body>
+<div class="bg">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grid"></div>
+</div>
+
+<div class="wrap">
+    <form class="card" id="loginForm" autocomplete="on">
+        <div class="brand">
+            <div class="mark"></div>
+            <div>
+                <b>wisd</b>
+                <div class="sub">VPS VPN panel</div>
+            </div>
+        </div>
+
+        <h1>Вход в панель</h1>
+        <div class="hint">Этот сервер защищён. Введи логин и пароль, выданные при установке (см. вывод <span class="mono" style="color:#cdd6e3">install.sh</span> или <span class="mono" style="color:#cdd6e3">/var/lib/wisd/admin.txt</span>).</div>
+
+        <label for="user">Логин</label>
+        <div class="field-wrap">
+            <input class="field" type="text" name="user" id="user" placeholder="admin" autocomplete="username" required>
+        </div>
+
+        <label for="pass">Пароль</label>
+        <div class="field-wrap">
+            <input class="field" type="password" name="pass" id="pass" autocomplete="current-password" required>
+            <button type="button" class="eye" id="eyeBtn" aria-label="Показать пароль">
+                <svg viewBox="0 0 24 24" id="eyeIcon">
+                    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </button>
+        </div>
+
+        <button class="btn" type="submit" id="submitBtn">
+            <span class="label">Войти</span>
+            <span class="spinner"><span class="spinner-ring"></span></span>
+        </button>
+
+        <div class="error" id="error"></div>
+
+        <div class="footer"><span class="dot"></span>wisd / 5 транспортов VPN</div>
+    </form>
+</div>
+
+<script>
+const $ = (s, r=document) => r.querySelector(s);
+const form = $('#loginForm');
+const userIn = $('#user');
+const passIn = $('#pass');
+const eyeBtn = $('#eyeBtn');
+const submitBtn = $('#submitBtn');
+const errorEl = $('#error');
+const card = $('.card');
+
+userIn.focus();
+
+eyeBtn.addEventListener('click', () => {
+    const showing = passIn.type === 'text';
+    passIn.type = showing ? 'password' : 'text';
+    $('#eyeIcon').innerHTML = showing
+        ? '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle>'
+        : '<path d="M17.94 17.94A10.97 10.97 0 0 1 12 19c-7 0-11-7-11-7a19.79 19.79 0 0 1 4.22-5.14"></path><path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a19.86 19.86 0 0 1-3.17 4.19"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+});
+
+function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add('show');
+    card.classList.remove('shake');
+    void card.offsetWidth;
+    card.classList.add('shake');
+}
+function hideError() {
+    errorEl.classList.remove('show');
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+    submitBtn.classList.add('loading');
+    submitBtn.disabled = true;
+
+    const body = new URLSearchParams();
+    body.set('user', userIn.value.trim());
+    body.set('pass', passIn.value);
+
+    try {
+        const r = await fetch('/cgi-bin/login.cgi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: body.toString(),
+            credentials: 'same-origin',
+        });
+        let payload = {};
+        try { payload = await r.json(); } catch (_) { /* ignore */ }
+        if (!r.ok || !payload.ok) {
+            showError(payload.message === 'invalid credentials'
+                ? 'Неверный логин или пароль'
+                : (payload.message || `Ошибка ${r.status}`));
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            passIn.select();
+            return;
+        }
+        // Success — gentle flash, then redirect.
+        submitBtn.classList.remove('loading');
+        submitBtn.innerHTML = '<span class="label">Готово</span>';
+        submitBtn.style.background = 'linear-gradient(135deg,#6ee7b7,#22c55e)';
+        const next = new URLSearchParams(location.search).get('next') || '/';
+        setTimeout(() => { location.href = next; }, 350);
+    } catch (err) {
+        showError('Ошибка сети: ' + err.message);
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+    }
+});
+</script>
+</body>
+</html>

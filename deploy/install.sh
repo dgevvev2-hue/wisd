@@ -35,7 +35,7 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
 apt-get install -y --no-install-recommends \
     nginx fcgiwrap jq curl ca-certificates unzip uuid-runtime python3 xxd sudo \
-    openssl nftables
+    openssl nftables certbot
 # Make sure /etc/sudoers.d exists (minimal Debian images may omit it).
 mkdir -p /etc/sudoers.d
 chmod 0750 /etc/sudoers.d
@@ -363,6 +363,36 @@ nft -f /etc/nftables.d/wisd-hop.conf
 systemctl enable nftables.service 2>/dev/null || true
 systemctl restart nftables.service 2>/dev/null || true
 
+step "Bootstrap admin credentials + session key"
+ADMIN_FILE=$STATE_DIR/admin.json
+SESSION_KEY=$STATE_DIR/session.key
+ADMIN_TXT=$STATE_DIR/admin.txt
+
+# Random 32-byte session signing key (HMAC-SHA256).
+if [[ ! -s "$SESSION_KEY" ]]; then
+    head -c 48 /dev/urandom | base64 -w0 > "$SESSION_KEY"
+    chown wisd:www-data "$SESSION_KEY"
+    chmod 0640 "$SESSION_KEY"
+fi
+
+# Admin user + bcrypt-equivalent (PBKDF2-SHA256) password hash.
+if [[ ! -s "$ADMIN_FILE" ]]; then
+    admin_user=${WISD_ADMIN_USER:-admin}
+    admin_pass=${WISD_ADMIN_PASS:-$(head -c 18 /dev/urandom | base64 | tr -d '+/=' | head -c 20)}
+    admin_hash=$(python3 "$REPO_DIR/site/cgi-bin/wisd_auth.py" hash "$admin_pass")
+    jq -n --arg u "$admin_user" --arg h "$admin_hash" \
+        '{user:$u, passHash:$h}' > "$ADMIN_FILE"
+    chown wisd:www-data "$ADMIN_FILE"
+    chmod 0640 "$ADMIN_FILE"
+    # Plaintext copy for the operator (root-only) so they can recover the
+    # initial password without re-running with WISD_ADMIN_PASS.
+    umask 077
+    printf 'wisd admin credentials\nuser: %s\npass: %s\n' "$admin_user" "$admin_pass" > "$ADMIN_TXT"
+    umask 022
+    chown root:root "$ADMIN_TXT"
+    chmod 0600 "$ADMIN_TXT"
+fi
+
 step "Install nginx site"
 install -m 0644 "$REPO_DIR/deploy/wisd.nginx.conf" /etc/nginx/sites-available/wisd
 ln -sf /etc/nginx/sites-available/wisd /etc/nginx/sites-enabled/wisd
@@ -391,10 +421,183 @@ else
     rm -f /etc/nginx/wisd-ws.location
 fi
 
+step "Configure HTTP mode (panel-on-HTTP or redirect-to-HTTPS)"
+# Reusable helper: write the auth-protected location blocks (used by both
+# the HTTP fallback and the HTTPS server block).
+write_panel_locations() {
+    local out=$1
+    cat > "$out" <<'NGINX'
+# Public (no auth) — login page, its assets, login/logout CGI, ACME, favicon.
+location = /login.html { try_files /login.html =404; }
+location = /favicon.ico { try_files /assets/icon.svg =404; }
+location ^~ /assets/ { try_files $uri =404; }
+location = /cgi-bin/login.cgi {
+    gzip off;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass unix:/run/fcgiwrap.socket;
+    fastcgi_param SCRIPT_FILENAME /var/www/wisd$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT /var/www/wisd;
+    fastcgi_read_timeout 60s;
+}
+location = /cgi-bin/logout.cgi {
+    gzip off;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass unix:/run/fcgiwrap.socket;
+    fastcgi_param SCRIPT_FILENAME /var/www/wisd$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT /var/www/wisd;
+    fastcgi_read_timeout 10s;
+}
+# Internal subrequest endpoint for auth_request.
+location = /__auth {
+    internal;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass unix:/run/fcgiwrap.socket;
+    fastcgi_param SCRIPT_FILENAME /var/www/wisd/cgi-bin/auth.cgi;
+    fastcgi_param SCRIPT_NAME /cgi-bin/auth.cgi;
+    fastcgi_param REQUEST_METHOD GET;
+    fastcgi_param QUERY_STRING "";
+    fastcgi_param CONTENT_TYPE "";
+    fastcgi_param CONTENT_LENGTH "";
+    fastcgi_pass_request_body off;
+}
+# Protected: static files (HTML/JS/CSS).
+location / {
+    auth_request /__auth;
+    error_page 401 = @to_login;
+    try_files $uri $uri/ =404;
+}
+# Protected: all other CGI.
+location ^~ /cgi-bin/ {
+    auth_request /__auth;
+    error_page 401 = @auth_json_401;
+    gzip off;
+    include /etc/nginx/fastcgi_params;
+    fastcgi_pass unix:/run/fcgiwrap.socket;
+    fastcgi_param SCRIPT_FILENAME /var/www/wisd$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT /var/www/wisd;
+    fastcgi_read_timeout 60s;
+}
+location @to_login {
+    return 302 /login.html?next=$request_uri;
+}
+location @auth_json_401 {
+    default_type application/json;
+    return 401 '{"ok":false,"code":401,"message":"auth required"}';
+}
+NGINX
+}
+
+WISD_DOMAIN=${WISD_DOMAIN:-}
+TLS_PORT=${WISD_TLS_PORT:-4443}
+CERT_DIR=""
+if [[ -n "$WISD_DOMAIN" ]]; then
+    CERT_DIR="/etc/letsencrypt/live/$WISD_DOMAIN"
+fi
+
+if [[ -n "$WISD_DOMAIN" && -s "$CERT_DIR/fullchain.pem" ]]; then
+    # TLS is set up — :80 redirects to HTTPS, panel served from :4443.
+    cat > /etc/nginx/wisd-http-mode.conf <<NGINX
+location / {
+    return 301 https://\$host:${TLS_PORT}\$request_uri;
+}
+NGINX
+    # HTTPS server with auth-protected panel.
+    write_panel_locations /tmp/wisd-https-locations.conf
+    {
+        cat <<NGINX
+server {
+    listen ${TLS_PORT} ssl http2 default_server;
+    listen [::]:${TLS_PORT} ssl http2 default_server;
+    server_name ${WISD_DOMAIN} www.${WISD_DOMAIN};
+
+    ssl_certificate     ${CERT_DIR}/fullchain.pem;
+    ssl_certificate_key ${CERT_DIR}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_session_cache shared:wisd_ssl:8m;
+    ssl_session_timeout 1d;
+    add_header Strict-Transport-Security "max-age=15552000" always;
+
+    root /var/www/wisd;
+    index index.html;
+
+    access_log /var/log/nginx/wisd-https.access.log;
+    error_log  /var/log/nginx/wisd-https.error.log;
+
+    client_max_body_size 1m;
+
+NGINX
+        cat /tmp/wisd-https-locations.conf
+        printf '}\n'
+    } > /etc/nginx/wisd-https.server
+    rm -f /tmp/wisd-https-locations.conf
+else
+    # No TLS / no domain — panel served over plain HTTP on :80.
+    # Apply the same auth-protected location blocks.
+    write_panel_locations /etc/nginx/wisd-http-mode.conf
+    rm -f /etc/nginx/wisd-https.server
+fi
+
 nginx -t
 systemctl restart nginx
 systemctl enable fcgiwrap.socket fcgiwrap.service 2>/dev/null || true
 systemctl restart fcgiwrap.socket 2>/dev/null || systemctl restart fcgiwrap || true
+
+if [[ -n "$WISD_DOMAIN" && ! -s "$CERT_DIR/fullchain.pem" ]]; then
+    step "Obtain Let's Encrypt cert for $WISD_DOMAIN"
+    mkdir -p /var/www/html
+    domains="-d $WISD_DOMAIN"
+    if getent hosts "www.$WISD_DOMAIN" >/dev/null 2>&1; then
+        domains="$domains -d www.$WISD_DOMAIN"
+    fi
+    if certbot certonly --webroot -w /var/www/html \
+            --non-interactive --agree-tos \
+            --email "${WISD_LE_EMAIL:-admin@$WISD_DOMAIN}" \
+            $domains; then
+        # Switch HTTP mode to redirect, install HTTPS server block, reload.
+        cat > /etc/nginx/wisd-http-mode.conf <<NGINX
+location / {
+    return 301 https://\$host:${TLS_PORT}\$request_uri;
+}
+NGINX
+        write_panel_locations /tmp/wisd-https-locations.conf
+        {
+            cat <<NGINX
+server {
+    listen ${TLS_PORT} ssl http2 default_server;
+    listen [::]:${TLS_PORT} ssl http2 default_server;
+    server_name ${WISD_DOMAIN} www.${WISD_DOMAIN};
+
+    ssl_certificate     ${CERT_DIR}/fullchain.pem;
+    ssl_certificate_key ${CERT_DIR}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_session_cache shared:wisd_ssl:8m;
+    ssl_session_timeout 1d;
+    add_header Strict-Transport-Security "max-age=15552000" always;
+
+    root /var/www/wisd;
+    index index.html;
+
+    access_log /var/log/nginx/wisd-https.access.log;
+    error_log  /var/log/nginx/wisd-https.error.log;
+
+    client_max_body_size 1m;
+
+NGINX
+            cat /tmp/wisd-https-locations.conf
+            printf '}\n'
+        } > /etc/nginx/wisd-https.server
+        rm -f /tmp/wisd-https-locations.conf
+        nginx -t && systemctl reload nginx
+        echo "TLS configured: https://$WISD_DOMAIN:${TLS_PORT}/"
+    else
+        echo "!! certbot failed for $WISD_DOMAIN — staying on HTTP for now."
+        echo "!! Check that the A record for $WISD_DOMAIN points at this VPS and re-run with WISD_DOMAIN=$WISD_DOMAIN."
+    fi
+fi
 
 step "Deploy site files to $WEB_ROOT"
 mkdir -p "$WEB_ROOT"
@@ -417,6 +620,7 @@ if command -v ufw >/dev/null 2>&1; then
         hy2_hi=$(jq -r '.hy2PortHigh // 50000' "$SERVER_FILE")
         ufw allow 80/tcp >/dev/null
         ufw allow 443/tcp >/dev/null
+        ufw allow "${WISD_TLS_PORT:-4443}/tcp" >/dev/null
         ufw allow "$s_sp/tcp" >/dev/null
         ufw allow "$s_hp/tcp" >/dev/null
         ufw allow "$hy2_port/udp" >/dev/null
@@ -444,8 +648,18 @@ echo "hysteria2://${hy2_pass}@${pubip}:${hy2_port}?insecure=1&sni=${hy2_sni}&mpo
 chown wisd:wisd "$STATE_DIR/client_url.txt" "$STATE_DIR/hy2_url.txt"
 
 step "Done"
-echo "Panel:        http://$pubip/"
+if [[ -n "${WISD_DOMAIN:-}" && -s "/etc/letsencrypt/live/$WISD_DOMAIN/fullchain.pem" ]]; then
+    echo "Panel:        https://$WISD_DOMAIN:${TLS_PORT:-4443}/"
+else
+    echo "Panel:        http://$pubip/"
+fi
+echo "Admin file:   $ADMIN_TXT  (root-only, contains initial password)"
+if [[ -s "$ADMIN_TXT" ]]; then
+    echo "---"
+    cat "$ADMIN_TXT"
+    echo "---"
+fi
 echo "VLESS URL:    $(cat "$STATE_DIR/client_url.txt")"
 echo "Hysteria2 URL: $(cat "$STATE_DIR/hy2_url.txt")"
 echo "State dir:    $STATE_DIR"
-echo "Logs:       $LOG_DIR"
+echo "Logs:         $LOG_DIR"
