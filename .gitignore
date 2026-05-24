@@ -42,3 +42,7 @@ proxy_manager/android/local.properties
 *.bak
 *.swp
 *.orig
+
+# devin scratch
+test-plan.md
+test-report.md
