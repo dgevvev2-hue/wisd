@@ -362,6 +362,9 @@ async function loadVps() {
         }
         const p = r.proxy || {};
         const h = r.hysteria2 || {};
+        const t = r.tuic || {};
+        const s = r.shadowtls || {};
+        const w = r.ws || {};
         const hy2Section = h.url ? `
             <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
 
@@ -379,6 +382,70 @@ async function loadVps() {
                 <button id="copyHy2" class="btn">Копировать Hysteria2</button>
             </div>
         ` : '';
+        const tuicSection = t.url ? `
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+            <h3 style="margin:0 0 6px">TUIC v5 (UDP — альт. фингерпринт)</h3>
+            <div class="empty" style="margin:0 0 10px;font-size:12px">
+                Резерв на случай, если Hysteria2 заметят. Другой QUIC-stack, другой паттерн пакетов.
+            </div>
+            <div class="row"><span>Адрес</span><b class="mono">${escapeHtml(r.host)}:${t.port}/UDP</b></div>
+            <div class="row"><span>UUID</span><b class="mono">${escapeHtml(t.uuid || '')}</b></div>
+            <div class="row"><span>Пароль</span><b class="mono">${escapeHtml(t.pass || '')}</b></div>
+            <div class="row"><span>SNI</span><b>${escapeHtml(t.sni || '')}</b></div>
+            <div class="url" id="tuicUrl">${escapeHtml(t.url)}</div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+                <button id="copyTuic" class="btn">Копировать TUIC</button>
+            </div>
+        ` : '';
+        const stlsSection = s.handshakeHost ? `
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+            <h3 style="margin:0 0 6px">ShadowTLS + Shadowsocks-2022 (TCP — маска под белый домен)</h3>
+            <div class="empty" style="margin:0 0 10px;font-size:12px">
+                Handshake идёт как настоящий TLS к <b>${escapeHtml(s.handshakeHost)}</b> — DPI видит «открыли vk.com».
+                Внутри — Shadowsocks-2022, который сам по себе DPI не палится.
+                Требует клиента с поддержкой ShadowTLS (Karing, sing-box, Clash Meta).
+            </div>
+            <div class="row"><span>Адрес</span><b class="mono">${escapeHtml(r.host)}:${s.port}/TCP</b></div>
+            <div class="row"><span>Маскировка</span><b>${escapeHtml(s.handshakeHost)}:443</b></div>
+            <div class="row"><span>ShadowTLS пароль</span><b class="mono">${escapeHtml(s.stlsPass || '')}</b></div>
+            <div class="row"><span>SS пароль</span><b class="mono">${escapeHtml(s.ssPass || '')}</b></div>
+            <div class="row"><span>SS метод</span><b class="mono">${escapeHtml(s.ssMethod || '')}</b></div>
+            <div class="row" style="justify-content:flex-end;gap:8px">
+                <button id="copyStls" class="btn">Скопировать конфиг</button>
+            </div>
+        ` : '';
+        const wsSection = w.path ? `
+            <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+
+            <h3 style="margin:0 0 6px">VLESS-WS — обход белого списка через Cloudflare</h3>
+            <div class="empty" style="margin:0 0 10px;font-size:12px">
+                Когда сеть пропускает только «белые» IP (Cloudflare, госуслуги и т.д.), VLESS-Reality на 443 не пройдёт.
+                Развёртываешь воркер по инструкции <a href="https://github.com/dgevvev2-hue/wisd/blob/main/deploy/cloudflare-worker.README.md" target="_blank">cloudflare-worker.README.md</a> —
+                клиент тогда стучится в <code>*.workers.dev</code>, а Worker перебрасывает на этот VPS.
+            </div>
+            <div class="row"><span>WS path</span><b class="mono">${escapeHtml(w.path)}</b></div>
+            <div class="row"><span>WS port (внутр.)</span><b class="mono">${w.port}</b></div>
+            <div class="row"><span>Прямой URL (если разрешён доступ к VPS)</span><b></b></div>
+            <div class="url" id="wsDirectUrl">${escapeHtml(w.directUrl || '')}</div>
+            ${w.cfHost ? `
+              <div class="row"><span>CF Worker</span><b class="mono">${escapeHtml(w.cfHost)}</b></div>
+              <div class="url" id="wsCfUrl">${escapeHtml(w.cfUrl || '')}</div>
+            ` : `
+              <div class="row" style="margin-top:8px"><span>CF Worker</span><b class="mono">не настроен</b></div>
+              <div class="empty" style="margin:6px 0;font-size:12px">
+                После деплоя Worker'а зайди на сервер и пропиши:<br>
+                <code class="mono" style="font-size:11px;display:block;padding:6px;background:var(--bg-soft,#f5f5f5);border-radius:4px;margin-top:4px">
+                  jq '.cfWorkerHost = "your-worker.workers.dev"' /var/lib/wisd/server.json &gt; /tmp/s.json &amp;&amp; mv /tmp/s.json /var/lib/wisd/server.json
+                </code>
+              </div>
+            `}
+            <div class="row" style="justify-content:flex-end;gap:8px">
+                <button id="copyWsDirect" class="btn">Прямой URL</button>
+                ${w.cfHost ? '<button id="copyWsCf" class="btn">CF URL</button>' : ''}
+            </div>
+        ` : '';
         box.innerHTML = `
             <h3 style="margin:0 0 10px">VLESS-Reality (TCP — основной туннель)</h3>
             <div class="row"><span>Адрес</span><b>${escapeHtml(r.host)}:${r.port}</b></div>
@@ -394,6 +461,9 @@ async function loadVps() {
             </div>
 
             ${hy2Section}
+            ${tuicSection}
+            ${stlsSection}
+            ${wsSection}
 
             <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
 
@@ -422,6 +492,20 @@ async function loadVps() {
         $('#copyPass').addEventListener('click', () => copy(p.pass || ''));
         const copyHy2 = $('#copyHy2');
         if (copyHy2) copyHy2.addEventListener('click', () => copy(h.url || ''));
+        const copyTuic = $('#copyTuic');
+        if (copyTuic) copyTuic.addEventListener('click', () => copy(t.url || ''));
+        const copyStls = $('#copyStls');
+        if (copyStls) copyStls.addEventListener('click', () => {
+            const cfg = JSON.stringify({
+                shadowtls: { host: r.host, port: s.port, version: 3, password: s.stlsPass },
+                shadowsocks: { server: '127.0.0.1', port: 8388, method: s.ssMethod, password: s.ssPass }
+            }, null, 2);
+            copy(cfg);
+        });
+        const copyWsDirect = $('#copyWsDirect');
+        if (copyWsDirect) copyWsDirect.addEventListener('click', () => copy(w.directUrl || ''));
+        const copyWsCf = $('#copyWsCf');
+        if (copyWsCf) copyWsCf.addEventListener('click', () => copy(w.cfUrl || ''));
     } catch (e) {
         box.innerHTML = `<div class="empty">${escapeHtml(e.message)}</div>`;
     }

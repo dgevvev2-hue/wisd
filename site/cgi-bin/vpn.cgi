@@ -75,6 +75,9 @@ build_config() {
     s_proxy_pass=$(jq -r '.proxyPass // ""' "$WISD_SERVER_FILE")
     s_socks_port=$(jq -r '.socksPort // 1080' "$WISD_SERVER_FILE")
     s_http_port=$(jq -r '.httpPort // 1081' "$WISD_SERVER_FILE")
+    local s_ws_port s_ws_path
+    s_ws_port=$(jq -r '.wsPort // 0' "$WISD_SERVER_FILE")
+    s_ws_path=$(jq -r '.wsPath // ""' "$WISD_SERVER_FILE")
 
     local out_node='{}'
     if [[ "$mode" == "tunnel" ]]; then
@@ -97,6 +100,8 @@ build_config() {
           --arg sPp "$s_proxy_pass" \
           --argjson sSp "$s_socks_port" \
           --argjson sHp "$s_http_port" \
+          --argjson sWp "$s_ws_port" \
+          --arg sWpath "$s_ws_path" \
           --arg mode "$mode" \
           --argjson node "$out_node" '
     def server_inbound:
@@ -142,6 +147,23 @@ build_config() {
           else
             {}
           end )
+      };
+    def ws_inbound:
+      {
+        tag: "vless-ws-in",
+        listen: "0.0.0.0",
+        port: $sWp,
+        protocol: "vless",
+        settings: {
+          clients: [{ id: $sUuid }],
+          decryption: "none"
+        },
+        streamSettings: {
+          network: "ws",
+          security: "none",
+          wsSettings: { path: $sWpath }
+        },
+        sniffing: { enabled: true, destOverride: ["http","tls"] }
       };
     def freedom_out:
       { tag: "direct", protocol: "freedom", settings: {} };
@@ -193,7 +215,10 @@ build_config() {
       };
     {
       log: { loglevel: "warning", error: $log, access: $access },
-      inbounds: [ server_inbound, proxy_socks, proxy_http ],
+      inbounds: (
+        [ server_inbound, proxy_socks, proxy_http ]
+        + ( if ($sWp // 0) > 0 and ($sWpath // "") != "" then [ ws_inbound ] else [] end )
+      ),
       outbounds: (
         if $mode == "tunnel" then
           [ vless_outbound($node), freedom_out, blocked_out ]
@@ -206,12 +231,12 @@ build_config() {
         rules: (
           if $mode == "tunnel" then
             [
-              { type: "field", inboundTag: ["vless-in"], outboundTag: "tunnel" },
+              { type: "field", inboundTag: ["vless-in","vless-ws-in"], outboundTag: "tunnel" },
               { type: "field", inboundTag: ["socks-in","http-in"], outboundTag: "tunnel" }
             ]
           else
             [
-              { type: "field", inboundTag: ["vless-in","socks-in","http-in"], outboundTag: "direct" }
+              { type: "field", inboundTag: ["vless-in","vless-ws-in","socks-in","http-in"], outboundTag: "direct" }
             ]
           end
         )

@@ -199,9 +199,11 @@ if [[ ! -x /usr/local/bin/sing-box ]] || ! /usr/local/bin/sing-box version 2>/de
     rm -rf "$tmp"
 fi
 
-step "Generate Hysteria2 secrets + self-signed cert"
+step "Generate Hysteria2 + TUIC + ShadowTLS secrets + self-signed cert"
 HY2_DIR=/etc/wisd-hy2
 mkdir -p "$HY2_DIR"
+
+# Hysteria2 + port-hopping range
 if ! jq -e '.hy2Pass' "$SERVER_FILE" >/dev/null 2>&1; then
     hy2_pass=$(head -c 24 /dev/urandom | base64 | tr -d '+/=' | head -c 32)
     hy2_sni=${WISD_HY2_SNI:-www.bing.com}
@@ -213,9 +215,51 @@ if ! jq -e '.hy2Pass' "$SERVER_FILE" >/dev/null 2>&1; then
     chown wisd:wisd "$SERVER_FILE"
     chmod 0640 "$SERVER_FILE"
 fi
+
+# TUIC v5 (alt UDP transport — different fingerprint vs Hysteria2)
+if ! jq -e '.tuicUuid' "$SERVER_FILE" >/dev/null 2>&1; then
+    tuic_uuid=$(cat /proc/sys/kernel/random/uuid)
+    tuic_pass=$(head -c 18 /dev/urandom | base64 | tr -d '+/=' | head -c 24)
+    tmp=$(mktemp)
+    jq --arg tu "$tuic_uuid" --arg tp "$tuic_pass" --argjson tport 8443 \
+       '. + {tuicUuid:$tu, tuicPass:$tp, tuicPort:$tport}' \
+       "$SERVER_FILE" > "$tmp" && mv "$tmp" "$SERVER_FILE"
+    chown wisd:wisd "$SERVER_FILE"; chmod 0640 "$SERVER_FILE"
+fi
+
+# ShadowTLS v3 + Shadowsocks-2022 (TCP, masks as Russian whitelisted site)
+if ! jq -e '.stlsPass' "$SERVER_FILE" >/dev/null 2>&1; then
+    stls_pass=$(head -c 24 /dev/urandom | base64 | tr -d '+/=' | head -c 32)
+    ss_pass=$(head -c 16 /dev/urandom | base64 -w0)
+    tmp=$(mktemp)
+    jq --arg sp "$stls_pass" --arg ss "$ss_pass" \
+       --arg sh "${WISD_STLS_HOST:-vk.com}" --argjson stp 8443 \
+       '. + {stlsPass:$sp, ssPass:$ss, stlsHandshakeHost:$sh, stlsPort:$stp}' \
+       "$SERVER_FILE" > "$tmp" && mv "$tmp" "$SERVER_FILE"
+    chown wisd:wisd "$SERVER_FILE"; chmod 0640 "$SERVER_FILE"
+fi
+
+# VLESS-WS endpoint (used by Cloudflare Worker relay for whitelist bypass)
+if ! jq -e '.wsPath' "$SERVER_FILE" >/dev/null 2>&1; then
+    wsws_path=/$(head -c 6 /dev/urandom | xxd -p -c 12)
+    tmp=$(mktemp)
+    jq --arg wp "$wsws_path" --argjson wpp 10443 \
+       '. + {wsPath:$wp, wsPort:$wpp}' \
+       "$SERVER_FILE" > "$tmp" && mv "$tmp" "$SERVER_FILE"
+    chown wisd:wisd "$SERVER_FILE"; chmod 0640 "$SERVER_FILE"
+fi
+
 HY2_PASS=$(jq -r '.hy2Pass' "$SERVER_FILE")
 HY2_SNI=$(jq -r '.hy2Sni' "$SERVER_FILE")
 HY2_PORT=$(jq -r '.hy2Port' "$SERVER_FILE")
+TUIC_UUID=$(jq -r '.tuicUuid' "$SERVER_FILE")
+TUIC_PASS=$(jq -r '.tuicPass' "$SERVER_FILE")
+TUIC_PORT=$(jq -r '.tuicPort' "$SERVER_FILE")
+STLS_PASS=$(jq -r '.stlsPass' "$SERVER_FILE")
+SS_PASS=$(jq -r '.ssPass' "$SERVER_FILE")
+STLS_HH=$(jq -r '.stlsHandshakeHost' "$SERVER_FILE")
+STLS_PORT=$(jq -r '.stlsPort' "$SERVER_FILE")
+
 if [[ ! -f "$HY2_DIR/cert.crt" ]]; then
     openssl ecparam -genkey -name prime256v1 -out "$HY2_DIR/private.key"
     openssl req -new -x509 -days 3650 -key "$HY2_DIR/private.key" \
@@ -225,32 +269,72 @@ if [[ ! -f "$HY2_DIR/cert.crt" ]]; then
     chmod 0600 "$HY2_DIR/private.key"
 fi
 
-step "Write sing-box (Hysteria2) config"
-jq -n --arg pass "$HY2_PASS" --arg sni "$HY2_SNI" --argjson port "$HY2_PORT" '
+step "Write sing-box config (Hysteria2 + TUIC + ShadowTLS-SS)"
+cat > "$HY2_DIR/sing-box.json" <<JSON
 {
-  log: { level: "warn", timestamp: true },
-  inbounds: [{
-    type: "hysteria2",
-    tag: "hy2-in",
-    listen: "::",
-    listen_port: $port,
-    up_mbps: 1000,
-    down_mbps: 1000,
-    users: [{ name: "wisd", password: $pass }],
-    masquerade: ("https://" + $sni),
-    tls: {
-      enabled: true,
-      server_name: $sni,
-      alpn: ["h3"],
-      certificate_path: "/etc/wisd-hy2/cert.crt",
-      key_path: "/etc/wisd-hy2/private.key"
+  "log": { "level": "warn", "timestamp": true },
+  "inbounds": [
+    {
+      "type": "hysteria2",
+      "tag": "hy2-in",
+      "listen": "::",
+      "listen_port": ${HY2_PORT},
+      "up_mbps": 1000,
+      "down_mbps": 1000,
+      "users": [{ "name": "wisd", "password": "${HY2_PASS}" }],
+      "masquerade": "https://${HY2_SNI}",
+      "tls": {
+        "enabled": true,
+        "server_name": "${HY2_SNI}",
+        "alpn": ["h3"],
+        "certificate_path": "/etc/wisd-hy2/cert.crt",
+        "key_path": "/etc/wisd-hy2/private.key"
+      }
+    },
+    {
+      "type": "tuic",
+      "tag": "tuic-in",
+      "listen": "::",
+      "listen_port": ${TUIC_PORT},
+      "users": [{ "uuid": "${TUIC_UUID}", "password": "${TUIC_PASS}" }],
+      "congestion_control": "bbr",
+      "auth_timeout": "3s",
+      "zero_rtt_handshake": false,
+      "heartbeat": "10s",
+      "tls": {
+        "enabled": true,
+        "server_name": "${HY2_SNI}",
+        "alpn": ["h3"],
+        "certificate_path": "/etc/wisd-hy2/cert.crt",
+        "key_path": "/etc/wisd-hy2/private.key"
+      }
+    },
+    {
+      "type": "shadowtls",
+      "tag": "stls-in",
+      "listen": "::",
+      "listen_port": ${STLS_PORT},
+      "version": 3,
+      "users": [{ "name": "wisd", "password": "${STLS_PASS}" }],
+      "handshake": { "server": "${STLS_HH}", "server_port": 443 },
+      "strict_mode": true,
+      "detour": "ss-in"
+    },
+    {
+      "type": "shadowsocks",
+      "tag": "ss-in",
+      "listen": "127.0.0.1",
+      "listen_port": 8388,
+      "method": "2022-blake3-aes-128-gcm",
+      "password": "${SS_PASS}"
     }
-  }],
-  outbounds: [
-    { type: "direct", tag: "direct" },
-    { type: "block", tag: "block" }
+  ],
+  "outbounds": [
+    { "type": "direct", "tag": "direct" },
+    { "type": "block", "tag": "block" }
   ]
-}' > "$HY2_DIR/sing-box.json"
+}
+JSON
 chmod 0644 "$HY2_DIR/sing-box.json"
 
 step "Install Hysteria2 systemd unit"
@@ -283,6 +367,30 @@ step "Install nginx site"
 install -m 0644 "$REPO_DIR/deploy/wisd.nginx.conf" /etc/nginx/sites-available/wisd
 ln -sf /etc/nginx/sites-available/wisd /etc/nginx/sites-enabled/wisd
 rm -f /etc/nginx/sites-enabled/default
+
+# Generate the WS-passthrough location block (sourced from server.json).
+WS_PATH=$(jq -r '.wsPath // ""' "$SERVER_FILE")
+WS_PORT=$(jq -r '.wsPort // 0' "$SERVER_FILE")
+if [[ -n "$WS_PATH" && "$WS_PATH" != "null" && "$WS_PORT" -gt 0 ]]; then
+    cat > /etc/nginx/wisd-ws.location <<NGINX
+location ${WS_PATH} {
+    if (\$http_upgrade != "websocket") {
+        return 404;
+    }
+    proxy_pass http://127.0.0.1:${WS_PORT};
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection \$wisd_ws_upgrade;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+}
+NGINX
+else
+    rm -f /etc/nginx/wisd-ws.location
+fi
+
 nginx -t
 systemctl restart nginx
 systemctl enable fcgiwrap.socket fcgiwrap.service 2>/dev/null || true
