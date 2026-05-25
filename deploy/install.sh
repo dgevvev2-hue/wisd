@@ -283,8 +283,9 @@ cat > "$HY2_DIR/sing-box.json" <<JSON
       "tag": "hy2-in",
       "listen": "::",
       "listen_port": ${HY2_PORT},
-      "up_mbps": 1000,
-      "down_mbps": 1000,
+      "up_mbps": 200,
+      "down_mbps": 200,
+      "ignore_client_bandwidth": true,
       "users": [{ "name": "wisd", "password": "${HY2_PASS}" }],
       "masquerade": "https://${HY2_SNI}",
       "tls": {
