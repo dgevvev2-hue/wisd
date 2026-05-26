@@ -1,8 +1,0 @@
-{
-  "bot_token": "PASTE_TELEGRAM_BOT_TOKEN_HERE",
-  "allowed_chat_ids": [],
-  "router_base_url": "http://192.168.0.1:8083",
-  "default_server_id": 0,
-  "default_mode": "tunnel",
-  "request_timeout": 12
-}

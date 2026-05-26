@@ -1,1 +1,0 @@
-vless://7d45c0d6-3efb-4eef-9127-facde6e3975a@netherlands.otiumvpn.ru:443?security=reality&type=tcp&headerType=&path=&host=&flow=xtls-rprx-vision&sni=max.ru&fp=chrome&pbk=qB_eMu3ZO_wGITnyIqJ7Kt39-h9oHFnHlQQEqA-r3VA&sid=#%F0%9F%87%B3%F0%9F%87%B1%20%D0%9D%D0%B8%D0%B4%D0%B5%D1%80%D0%BB%D0%B0%D0%BD%D0%B4%D1%8B%20%7C%20%D0%9E%D0%B1%D1%85%D0%BE%D0%B4%203
